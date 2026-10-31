@@ -1,0 +1,40 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.tetris",
+  "name": "Tetris",
+  "version": "1.0.0",
+  "runtime": "lua",
+  "entry": "main.lua",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "graphics",
+    "input",
+    "timer",
+    "storage.private"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 20,
+    "persistent_kib": 4
+  },
+  "assets": [
+    {
+      "id": "sprites/tile",
+      "source": "assets/tile.png",
+      "width": 16,
+      "height": 16,
+      "encoding": "I4",
+      "kind": "sprite"
+    }
+  ],
+  "icon": "system.gamepad",
+  "display": {
+    "mode": "fullscreen",
+    "orientation": "portrait",
+    "navigation": "game",
+    "design_width": 240,
+    "design_height": 320
+  }
+}

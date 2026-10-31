@@ -1,0 +1,13 @@
+/build*/
+/managed_components/
+/sdkconfig
+/sdkconfig.poc
+/sdkconfig.old
+/module/native.app.elf
+
+/sdkconfig.protected
+__pycache__/
+
+/sdkconfig.pool
+/sdkconfig.pool-heap
+/sdkconfig.pool-text

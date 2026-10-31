@@ -1,0 +1,127 @@
+# --- 目标芯片 ---
+CONFIG_IDF_TARGET="esp32c3"
+# 注:ESP32-C3 无 PSRAM,故不设 CONFIG_SPIRAM。
+
+# --- Flash ---
+# FoloToy AI Passport 当前产品/固件基线使用 8MB Flash。
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+# 固定 8MB 镜像头，关闭 detect，便于 idf.py merge-bin。
+CONFIG_ESPTOOLPY_HEADER_FLASHSIZE_UPDATE=n
+# Passport OS product layout: retain dual 2.5 MiB OTA slots and app data.
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+# --- 控制台:USB-Serial-JTAG(C3 原生 USB,GPIO18/19)---
+# 不用 UART0:其默认 TX=GPIO21 与本板背光引脚冲突。
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+
+# --- LVGL ---
+CONFIG_LV_COLOR_DEPTH_16=y
+# 20 ms display refresh period targets up to 50 FPS when rendering and SPI
+# transfer complete within the same budget.
+CONFIG_LV_DEF_REFR_PERIOD=20
+CONFIG_LV_FONT_MONTSERRAT_14=y
+CONFIG_LV_FONT_MONTSERRAT_20=y
+# Simplified Chinese system UI fallback; LVGL's built-in common CJK subset.
+CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK=n
+# LVGL 内置 malloc 池大小(KB)。它是独立静态区、不与系统堆共享,配大了会白白占用 RAM。
+# 本 demo UI 简单,24KB 足够;若自建复杂界面出现绘制卡死/看门狗,调大此值。
+CONFIG_LV_MEM_SIZE_KILOBYTES=16
+
+# --- 系统 ---
+CONFIG_FREERTOS_HZ=1000
+
+# BLE HID starts only for an owning Native foreground session.
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_BT_BLUEDROID_ENABLED=n
+CONFIG_BT_NIMBLE_ROLE_CENTRAL=n
+CONFIG_BT_NIMBLE_ROLE_OBSERVER=n
+CONFIG_BT_NIMBLE_ROLE_PERIPHERAL=y
+CONFIG_BT_NIMBLE_ROLE_BROADCASTER=y
+CONFIG_BT_CTRL_BLE_MAX_ACT=2
+CONFIG_BT_NIMBLE_MAX_CONNECTIONS=1
+CONFIG_BT_NIMBLE_MAX_BONDS=3
+CONFIG_BT_NIMBLE_MAX_CCCDS=6
+CONFIG_BT_NIMBLE_NVS_PERSIST=y
+CONFIG_BT_NIMBLE_ATT_PREFERRED_MTU=64
+CONFIG_BT_NIMBLE_MSYS_1_BLOCK_COUNT=8
+CONFIG_BT_NIMBLE_MSYS_2_BLOCK_COUNT=4
+CONFIG_BT_NIMBLE_TRANSPORT_ACL_FROM_LL_COUNT=6
+CONFIG_BT_NIMBLE_SVC_GAP_APPEARANCE=962
+CONFIG_BT_NIMBLE_STATIC_TO_DYNAMIC=y
+CONFIG_ESP_COEX_SW_COEXIST_ENABLE=y
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y
+CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384
+CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096
+# Release TLS record buffers between operations; retain certificate verification.
+CONFIG_MBEDTLS_DYNAMIC_BUFFER=y
+CONFIG_FREERTOS_USE_TRACE_FACILITY=y
+CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
+CONFIG_SPIFFS_OBJ_NAME_LEN=96
+CONFIG_SPIFFS_META_LENGTH=4
+CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y
+CONFIG_FREERTOS_RUN_TIME_STATS_USING_ESP_TIMER=y
+# AssetLoader owns bounded encoded buffers; prevent hidden decoded/header cache retention.
+CONFIG_LV_CACHE_DEF_SIZE=0
+CONFIG_LV_IMAGE_HEADER_CACHE_DEF_CNT=0
+CONFIG_LV_BIN_DECODER_RAM_LOAD=n
+
+# Size-optimized production build: preserve assertions, all fonts and TLS roots.
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+# Trusted native apps use a bounded arena; ordinary heap stays non-executable.
+CONFIG_ESP_SYSTEM_MEMPROT_FEATURE=y
+CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK=y
+CONFIG_ELF_LOADER=y
+CONFIG_ELF_LOADER_BUS_ADDRESS_MIRROR=n
+CONFIG_ELF_LOADER_LIBC_SYMBOLS=n
+CONFIG_ELF_LOADER_ESPIDF_SYMBOLS=n
+CONFIG_ELF_LOADER_CUSTOMER_SYMBOLS=n
+CONFIG_ELF_DYNAMIC_LOAD_SHARED_OBJECT=n
+CONFIG_NATIVE_EXEC_POOL=y
+CONFIG_NATIVE_EXEC_POOL_KIB=16
+CONFIG_NATIVE_EXEC_PROBE=0
+
+# Bounded interactive traffic on the no-PSRAM C3; retain RX BA window capacity.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=4
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=16
+CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM=16
+
+# Validate the full chain, then release the unused peer certificate copy.
+CONFIG_MBEDTLS_SSL_KEEP_PEER_CERTIFICATE=n
+# Timer callbacks only enqueue work; measured >3.5 KiB unused in the prior task.
+CONFIG_ESP_TIMER_TASK_STACK_SIZE=2048
+
+# Keep outbound audio/control frames independent from blocking WS receive.
+CONFIG_ESP_WS_CLIENT_SEPARATE_TX_LOCK=y
+
+# Preserve the previous glyph inventory in one compressed shared font.
+CONFIG_LV_USE_FONT_COMPRESSED=y
+# Reclaim optional Wi-Fi fast paths to budget the BLE controller's IRAM.
+# Protocol/security behavior is unchanged; validate throughput and voice on board.
+CONFIG_ESP_WIFI_IRAM_OPT=n
+CONFIG_ESP_WIFI_RX_IRAM_OPT=n
+
+# Match the receive block-ack window to the no-PSRAM radio buffer budget.
+CONFIG_ESP_WIFI_RX_BA_WIN=4
+
+# Production footprint: retain assert checks/abort; decode failures with the
+# matching archived ELF rather than embedding every assertion's text/path.
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT=y
+# OS offers HTTPS/WSS clients; phone setup remains local HTTP, not a TLS server.
+CONFIG_MBEDTLS_TLS_CLIENT_ONLY=y
+# Public assets use A1/A4/I4/I8/RGB565; transparent layers use ARGB8888/A8.
+# Keep RGB565 (including swapped), ARGB8888 and premultiplied alpha paths.
+CONFIG_LV_DRAW_SW_SUPPORT_RGB888=n
+CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888=n
+CONFIG_LV_DRAW_SW_SUPPORT_L8=n
+CONFIG_LV_DRAW_SW_SUPPORT_AL88=n
+CONFIG_LV_DRAW_SW_SUPPORT_I1=y
+
+# Encrypted phone setup via LVGL QR; I1 is needed by the QR canvas.
+CONFIG_LV_USE_CANVAS=y
+CONFIG_LV_USE_QRCODE=y

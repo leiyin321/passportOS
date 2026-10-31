@@ -1,0 +1,454 @@
+{
+  "format": "passport.capabilities/1",
+  "min_os_api": 1,
+  "namespace": "passport",
+  "functions": [
+    {
+      "name": "text",
+      "permission": "ui",
+      "arguments": [
+        "string <=500 bytes",
+        "optional RGB24 foreground color (0x000000..0xFFFFFF)"
+      ],
+      "returns": "none",
+      "description": "Replace MiniApp text and optionally set its foreground color. Defaults to a readable system dark/light foreground; choose a color with readable contrast against the app's surfaces. ASCII/font coverage must be checked."
+    },
+    {
+      "name": "clear",
+      "permission": "graphics",
+      "arguments": [],
+      "returns": "none",
+      "description": "Clear command canvas, no full-screen framebuffer allocation."
+    },
+    {
+      "name": "rect",
+      "permission": "graphics",
+      "arguments": [
+        "x integer",
+        "y integer",
+        "width positive integer",
+        "height positive integer",
+        "RGB24 integer"
+      ],
+      "returns": "none",
+      "bounds": "current viewport (240x272 standard / 240x320 fullscreen); <=192 commands per frame"
+    },
+    {
+      "name": "get",
+      "permission": "storage.private",
+      "arguments": [
+        "key: [a-z0-9_]{1,15}"
+      ],
+      "returns": "string or nil"
+    },
+    {
+      "name": "set",
+      "permission": "storage.private",
+      "arguments": [
+        "key: [a-z0-9_]{1,15}",
+        "value: string <=1024 bytes"
+      ],
+      "returns": "boolean",
+      "description": "Atomic per-key commit; namespace/quota owned by OS."
+    },
+    {
+      "name": "fetch",
+      "permission": "network.fetch",
+      "arguments": [
+        "GET URL <=500 bytes"
+      ],
+      "returns": "queued boolean",
+      "completion": "on_http(status, body)",
+      "limits": "one network connection; response <=4096 B; <=3 reauthorized redirects"
+    },
+    {
+      "name": "http.request",
+      "permission": "network.fetch",
+      "arguments": [
+        "method GET|POST",
+        "HTTPS URL <=500 bytes",
+        "optional header table <=8 headers / 1024 bytes",
+        "optional UTF-8 body <=2048 bytes"
+      ],
+      "returns": "queued boolean",
+      "completion": "on_http(status, body)",
+      "limits": "manifest exact-domain allowlist; TLS verified; response <=8192 bytes; completion reports HTTP status and body; GET redirects are reauthorized and remain on the same origin when custom headers are used; POST redirects are not followed; reserved headers and CR/LF rejected"
+    },
+    {
+      "name": "ws_connect",
+      "permission": "network.websocket",
+      "arguments": [
+        "WSS URL <=500 bytes",
+        "optional header table <=4 headers / 1024 bytes"
+      ],
+      "returns": "queued boolean",
+      "completion": "on_http(101, \"\") when transport client starts; connection readiness is polled with ws_connected; inbound messages use on_message(bytes, opcode)",
+      "limits": "WSS only; manifest exact-domain allowlist; TLS verified; automatic reconnect disabled; bounded handshake headers; reserved WebSocket headers rejected; explicitly close/reconnect"
+    },
+    {
+      "name": "ws_connected",
+      "permission": "network.websocket",
+      "arguments": [],
+      "returns": "boolean",
+      "description": "Whether the current WSS transport is connected."
+    },
+    {
+      "name": "ws_send",
+      "permission": "network.websocket",
+      "arguments": [
+        "bytes <=2048",
+        "binary boolean"
+      ],
+      "returns": "boolean",
+      "limits": "50 sends/s, 16KiB/s, bounded internal queues; no lifetime byte quota"
+    },
+    {
+      "name": "ws_close",
+      "permission": "network.websocket",
+      "arguments": [],
+      "returns": "none"
+    },
+    {
+      "name": "json.decode",
+      "permission": "none",
+      "arguments": [
+        "UTF-8 JSON <=8192 bytes"
+      ],
+      "returns": "Lua value or nil,error",
+      "limits": "depth <=8, 256 values, string <=2048 bytes; duplicate keys and non-finite numbers rejected"
+    },
+    {
+      "name": "json.encode",
+      "permission": "none",
+      "arguments": [
+        "bounded Lua value"
+      ],
+      "returns": "UTF-8 JSON <=8192 bytes or nil,error",
+      "limits": "depth <=8, 256 values, string <=2048 bytes, cyclic/sparse/mixed-key tables rejected"
+    },
+    {
+      "name": "system.public_device_identity",
+      "permission": "device.identity",
+      "arguments": [],
+      "returns": "{device_id: Wi-Fi MAC, client_id: stable app-scoped UUID} or nil",
+      "description": "Read-only; requires the device.identity Manifest permission. No private hardware secrets are returned."
+    },
+    {
+      "name": "audio.stream_start",
+      "permission": "audio.stream",
+      "arguments": [],
+      "returns": "boolean",
+      "description": "Starts OS Opus capture at 16 kHz mono, 60 ms frames; frames are delivered asynchronously through on_audio_frame. Requires foreground microphone consent."
+    },
+    {
+      "name": "audio.stream_stop",
+      "permission": "audio.stream",
+      "arguments": [],
+      "returns": "boolean",
+      "description": "Stops capture while keeping the stream worker available for reply playback. Worker, codecs and queues are released on app exit or runtime fault."
+    },
+    {
+      "name": "audio.play_opus",
+      "permission": "audio.stream",
+      "arguments": [
+        "raw Opus v1 frame <=1024 bytes"
+      ],
+      "returns": "queued boolean",
+      "description": "Queue one 16 kHz mono, 60 ms Opus frame for OS decode and speaker playback; at most three frames are queued."
+    },
+    {
+      "name": "microphone",
+      "permission": "audio.features",
+      "arguments": [
+        "enable boolean"
+      ],
+      "returns": "boolean",
+      "completion": "on_audio(RMS_percent)",
+      "description": "Requires system foreground consent. No raw PCM or network transmission."
+    },
+    {
+      "name": "system.language",
+      "permission": "none",
+      "arguments": [],
+      "returns": "'en' or 'zh-CN'",
+      "description": "Read the current system UI language. The value is set by the user and is available to every MiniApp."
+    },
+    {
+      "name": "system.display_mode",
+      "permission": "none",
+      "arguments": [],
+      "returns": "'dark' or 'light'",
+      "description": "Read the current system appearance selected in Settings. Read-only; MiniApps choose whether to follow it or use their own colors."
+    },
+    {
+      "name": "ui.icon",
+      "permission": "ui",
+      "arguments": [
+        "system icon ID",
+        "size integer 12..48 (default 24)",
+        "x integer (optional)",
+        "y integer (optional)",
+        "RGB24 integer (optional)"
+      ],
+      "returns": "none",
+      "description": "Shared system registry; unknown IDs use system.app-default."
+    },
+    {
+      "name": "graphics.sprite",
+      "permission": "graphics",
+      "arguments": [
+        "app:// declared resource ID",
+        "x integer",
+        "y integer"
+      ],
+      "returns": "boolean",
+      "description": "Session-owned native LVGL image; <=16 visible images; bounded encoded cache."
+    }
+  ],
+  "events": [
+    {
+      "name": "on_start",
+      "arguments": [
+        "0"
+      ]
+    },
+    {
+      "name": "on_button",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Backward-compatible alias for on_button_short; UP/DOWN fire on release, while OK waits for the 180 ms double-tap window."
+    },
+    {
+      "name": "on_button_down",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Physical press edge, dispatched immediately. Pair with on_button_up for hold interactions such as push-to-talk."
+    },
+    {
+      "name": "on_button_short",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Single short tap. UP/DOWN fire once on every release; OK fires after the 180 ms double-tap window."
+    },
+    {
+      "name": "on_button_double",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Reserved for compatibility; no double callback is delivered to MiniApps. UP/DOWN taps are always singles; double OK is consumed by the OS to return Home."
+    },
+    {
+      "name": "on_tick",
+      "arguments": [
+        "elapsed milliseconds"
+      ]
+    },
+    {
+      "name": "on_permission",
+      "arguments": [
+        "1 allow / 0 deny"
+      ]
+    },
+    {
+      "name": "on_audio",
+      "arguments": [
+        "RMS 0..100"
+      ]
+    },
+    {
+      "name": "on_audio_error",
+      "arguments": [
+        "error code"
+      ],
+      "description": "Asynchronous OS audio startup error. Code 1 means the stream worker could not start. Microphone consent remains granted; the app may retry after stopping the stream."
+    },
+    {
+      "name": "on_audio_frame",
+      "arguments": [
+        "Opus bytes <=512"
+      ],
+      "description": "One encoded 16 kHz mono, 60 ms Opus frame; dispatched while audio.stream capture is active."
+    },
+    {
+      "name": "on_http",
+      "arguments": [
+        "HTTP status, or -1",
+        "response bytes"
+      ]
+    },
+    {
+      "name": "on_message",
+      "arguments": [
+        "message bytes",
+        "1 text / 2 binary"
+      ]
+    },
+    {
+      "name": "on_stop",
+      "arguments": [
+        "0"
+      ],
+      "description": "Bounded cleanup; not guaranteed after VM fault. OS always releases resources."
+    },
+    {
+      "name": "on_long",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Backward-compatible alias for on_button_long."
+    },
+    {
+      "name": "on_button_long",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Button held through the 1,800 ms long-press threshold."
+    },
+    {
+      "name": "on_button_up",
+      "arguments": [
+        "0 UP / 1 DOWN / 2 OK"
+      ],
+      "description": "Immediate physical button release edge; delivered for all three keys, including short taps, double taps, and long presses."
+    }
+  ],
+  "vm": {
+    "lua": "5.4.8",
+    "integer_bits": 32,
+    "number_bits": 32,
+    "default_heap_bytes": 32768,
+    "maximum_heap_bytes": 65536,
+    "callback_instructions": 40000,
+    "callback_target_microseconds": 12000,
+    "absent": [
+      "io",
+      "os",
+      "debug",
+      "package",
+      "coroutine",
+      "load",
+      "dofile",
+      "loadfile",
+      "collectgarbage",
+      "pcall",
+      "xpcall",
+      "setmetatable",
+      "getmetatable"
+    ],
+    "string_patterns": "disabled; find requires plain=true"
+  },
+  "system_only": [
+    "Wi-Fi administration",
+    "publisher enrollment",
+    "service grants",
+    "OTA",
+    "raw Flash",
+    "GPIO",
+    "native code",
+    "raw TCP/UDP",
+    "LAN scan",
+    "BLE/ESP-NOW raw"
+  ],
+  "assets": {
+    "package": "PAP2; PAP1 remains supported",
+    "format": "PAI1 / LVGL 9.5",
+    "encodings": [
+      "A1",
+      "A4",
+      "I4",
+      "I8",
+      "RGB565"
+    ],
+    "default_cache_bytes": 8192,
+    "max_cache_bytes": 16384,
+    "max_dimension": 96,
+    "max_resources": 32
+  },
+  "display": {
+    "get_viewport": "passport.display.get_viewport() (alias getViewport) -> width, height, safeInsets{left,top,right,bottom}, mode",
+    "standard": {
+      "width": 240,
+      "height": 272,
+      "origin_screen_y": 24,
+      "system_bars": [
+        24,
+        24
+      ]
+    },
+    "fullscreen": {
+      "width": 240,
+      "height": 320,
+      "origin_screen_y": 0,
+      "system_bars": [
+        0,
+        0
+      ]
+    },
+    "safe_insets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "padding_default": 8,
+    "mode_request": "Not exposed to apps; signed manifest mode is fixed at launch."
+  },
+  "native_runtime": {
+    "minimum_firmware": "1.0.34",
+    "manifest_runtime": "native-elf",
+    "abi_spec": "sdk/native/abi-v1.json",
+    "header": "sdk/native/include/passport_native.h",
+    "publisher_policy": "built-in OS publisher only",
+    "lua_can_load_native": false,
+    "documentation": "docs/developer/native-apps.md",
+    "supported_abis": [
+      1,
+      2
+    ],
+    "services_abi": {
+      "abi": 2,
+      "minimum_firmware": "1.0.35",
+      "spec": "sdk/native/abi-v2.json",
+      "documentation": "docs/developer/native-services.md",
+      "validated_audio_firmware": "1.0.45"
+    }
+  },
+  "native_hid": {
+    "format": "passport.native-hid/1",
+    "minimum_firmware": "1.0.47",
+    "abi": 2,
+    "core_host_bytes_ilp32": 80,
+    "extended_host_bytes_ilp32": 96,
+    "header": "sdk/native/include/passport_native_hid.h",
+    "permission": "bluetooth.hid",
+    "native_only": true,
+    "profile": "encrypted bonded BLE HID mouse and Consumer Control",
+    "audio_profiles": false
+  },
+  "native_media": {
+    "format": "passport.native-media/1",
+    "minimum_firmware": "1.0.51",
+    "abi": 2,
+    "extended_host_bytes_ilp32": 120,
+    "header": "sdk/native/include/passport_native_media.h",
+    "permissions": [
+      "audio.playback",
+      "network.fetch"
+    ],
+    "native_only": true,
+    "microphone_consent_required": false,
+    "documentation": "docs/developer/city-radio.md",
+    "recommended_firmware": "1.0.59",
+    "public_http": {
+      "permission": "audio.http",
+      "minimum_firmware": "1.0.56",
+      "port": 80,
+      "public_ipv4_only": true,
+      "exact_manifest_domain_required": true,
+      "query_and_credentials_allowed": false
+    }
+  }
+}

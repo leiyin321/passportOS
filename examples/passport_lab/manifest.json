@@ -1,0 +1,31 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.device-lab",
+  "name": "Passport Lab",
+  "version": "1.0.0",
+  "runtime": "lua",
+  "entry": "main.lua",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "graphics",
+    "input",
+    "timer",
+    "storage.private",
+    "audio.features"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 10,
+    "persistent_kib": 4
+  },
+  "icon": "system.settings",
+  "display": {
+    "mode": "standard",
+    "orientation": "portrait",
+    "navigation": "select",
+    "design_width": 240,
+    "design_height": 320
+  }
+}

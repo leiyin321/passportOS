@@ -1,0 +1,40 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.weather",
+  "name": "Weather",
+  "version": "1.0.0",
+  "runtime": "declarative",
+  "entry": "ui.json",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "input",
+    "storage.private",
+    "network.fetch"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 20,
+    "persistent_kib": 4
+  },
+  "domains": [
+    "api.open-meteo.com"
+  ],
+  "assets": [
+    {
+      "id": "icons/weather",
+      "source": "assets/icon.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    }
+  ],
+  "icon": "app://icons/weather",
+  "display": {
+    "mode": "standard",
+    "orientation": "portrait",
+    "navigation": "select"
+  }
+}

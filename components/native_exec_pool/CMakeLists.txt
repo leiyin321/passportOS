@@ -1,0 +1,6 @@
+if(CONFIG_NATIVE_EXEC_POOL)
+    idf_component_register(SRCS "native_exec_pool.c" INCLUDE_DIRS "include" REQUIRES esp_hw_support heap)
+    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=esp_mprot_set_prot")
+else()
+    idf_component_register(INCLUDE_DIRS "include")
+endif()

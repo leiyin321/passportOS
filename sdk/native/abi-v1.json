@@ -1,0 +1,23 @@
+{
+  "format":"passport.native-abi/1",
+  "abi":1,
+  "target":"esp32c3",
+  "isa":"rv32imc_zicsr_zifencei",
+  "calling_convention":"ILP32 soft-float, matching ESP-IDF 5.5.3 toolchain",
+  "entry":"passport_app_entry",
+  "host_struct":"passport_native_host_v1",
+  "app_struct":"passport_native_app_v1",
+  "entry_result":{"success":0,"failure":"negative integer"},
+  "callbacks":["event","stop"],
+  "api":["text","clear","rect","millis","language","display_mode"],
+  "events":{"press":1,"release":2,"short":3,"double":4,"long":5,"tick":6},
+  "buttons":{"up":0,"down":1,"ok":2},
+  "reserved_navigation":"double OK returns to Launcher",
+  "file_limit_bytes":32768,
+  "exec_limit_bytes":16384,
+  "relocations":["R_RISCV_RELATIVE"],
+  "unresolved_imports":false,
+  "publisher_policy":"built-in OS publisher only",
+  "sandbox":false,
+  "minimum_firmware":"1.0.34"
+}

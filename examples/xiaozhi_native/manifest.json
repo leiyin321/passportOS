@@ -1,0 +1,40 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.xiaozhi-native",
+  "name": "XiaoZhi AI Native",
+  "version": "1.0.4",
+  "runtime": "native-elf",
+  "entry": "app.app.elf",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "graphics",
+    "input",
+    "timer",
+    "storage.private",
+    "network.fetch",
+    "network.websocket",
+    "audio.stream",
+    "device.identity"
+  ],
+  "domains": [
+    "api.tenclass.net"
+  ],
+  "limits": {
+    "native_exec_kib": 16,
+    "fps": 10,
+    "persistent_kib": 4
+  },
+  "icon": "system.app-default",
+  "display": {
+    "mode": "fullscreen",
+    "orientation": "portrait",
+    "navigation": "buttons",
+    "design_width": 240,
+    "design_height": 320
+  },
+  "target": "esp32c3",
+  "abi": 2,
+  "trusted": true
+}

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:passport:ui:1",
+  "title": "Passport Declarative UI v1",
+  "type": "object",
+  "required": ["format", "state", "ui"],
+  "properties": {
+    "format": { "const": "passport.ui/1" },
+    "title": { "type": "string", "maxLength": 1024 },
+    "state": {
+      "type": "object",
+      "propertyNames": { "type": "string", "maxLength": 64, "pattern": "^[A-Za-z0-9_]+$" }
+    },
+    "ui": { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/node" } },
+    "actions": {
+      "type": "object",
+      "properties": {
+        "up": { "$ref": "#/$defs/actionOrList" },
+        "down": { "$ref": "#/$defs/actionOrList" },
+        "ok": { "$ref": "#/$defs/actionOrList" }
+      },
+      "additionalProperties": false
+    },
+    "on_start": { "$ref": "#/$defs/actionOrList" },
+    "timer": {
+      "type": "object", "required": ["period_ms", "action"],
+      "properties": {
+        "period_ms": { "type": "integer", "minimum": 1000, "maximum": 2147483647 },
+        "action": { "$ref": "#/$defs/actionOrList" }
+      },
+      "additionalProperties": false
+    },
+    "datasource": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "maxLength": 500 },
+        "fields": { "type": "array", "maxItems": 64, "items": { "type": "string", "maxLength": 128 } }
+      },
+      "required": ["url"],
+      "additionalProperties": false
+    },
+    "cities": { "type": "array", "maxItems": 32 }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "path": {
+      "type": "string", "maxLength": 128,
+      "pattern": "^[A-Za-z0-9_]+(?:\\[[0-9]{1,3}\\])?(?:\\.[A-Za-z0-9_]+(?:\\[[0-9]{1,3}\\])?)*$"
+    },
+    "stateKey": {
+      "type": "string", "minLength": 1, "maxLength": 64,
+      "pattern": "^(?!display(?:\\.|$))[A-Za-z0-9_]+$"
+    },
+    "node": {
+      "oneOf": [
+        {
+          "type": "object", "required": ["type", "children"],
+          "properties": {
+            "type": { "enum": ["row", "column", "dialog"] },
+            "children": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["type", "name"],
+          "properties": {
+            "type": { "const": "icon" }, "name": { "type": "string", "maxLength": 64 },
+            "x": { "type": "integer", "minimum": 0, "maximum": 192 },
+            "y": { "type": "integer", "minimum": 0, "maximum": 156 },
+            "size": { "type": "integer", "minimum": 12, "maximum": 48 }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["type", "src"],
+          "properties": {
+            "type": { "const": "image" }, "src": { "type": "string", "maxLength": 64, "pattern": "^app://[a-z0-9]+(?:[/_-][a-z0-9]+)*$" },
+            "x": { "type": "integer", "minimum": 0, "maximum": 192 },
+            "y": { "type": "integer", "minimum": 0, "maximum": 156 },
+            "size": { "type": "integer", "minimum": 12, "maximum": 48 },
+            "width": { "type": "integer", "minimum": 1, "maximum": 96 },
+            "height": { "type": "integer", "minimum": 1, "maximum": 96 }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["type"],
+          "properties": {
+            "type": { "enum": ["text", "button", "progress", "select", "list"] },
+            "label": { "type": "string", "maxLength": 1024 },
+            "text": { "type": "string", "maxLength": 1024 },
+            "bind": { "$ref": "#/$defs/path" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "actionOrList": {
+      "oneOf": [
+        { "$ref": "#/$defs/action" },
+        { "type": "array", "maxItems": 64, "items": { "$ref": "#/$defs/action" } }
+      ]
+    },
+    "action": {
+      "oneOf": [
+        {
+          "type": "object", "required": ["type", "field"],
+          "properties": { "type": { "const": "increment" }, "field": { "$ref": "#/$defs/stateKey" }, "amount": { "type": "number", "minimum": -999999, "maximum": 999999 } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["type", "field", "value"],
+          "properties": { "type": { "const": "set" }, "field": { "$ref": "#/$defs/stateKey" }, "value": {} },
+          "additionalProperties": false
+        },
+        { "type": "object", "required": ["type"], "properties": { "type": { "const": "save" }, "field": { "$ref": "#/$defs/stateKey" } }, "additionalProperties": false },
+        { "type": "object", "required": ["type"], "properties": { "type": { "const": "fetch" } }, "additionalProperties": false },
+        {
+          "type": "object", "required": ["type", "field", "options", "index"],
+          "properties": { "type": { "const": "select" }, "field": { "$ref": "#/$defs/stateKey" }, "options": { "type": "string", "maxLength": 64 }, "index": { "$ref": "#/$defs/stateKey" }, "step": { "type": "integer", "minimum": -2147483647, "maximum": 2147483647 } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["type", "field", "then"],
+          "properties": { "type": { "const": "conditional" }, "field": { "$ref": "#/$defs/path" }, "then": { "$ref": "#/$defs/actionOrList" }, "else": { "$ref": "#/$defs/actionOrList" } },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

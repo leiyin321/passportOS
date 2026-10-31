@@ -1,0 +1,145 @@
+{
+  "format": "passport.capabilities.draft/1",
+  "status": "implemented-in-api-v1",
+  "principle": "OS implements bounded, permission-checked generic WebSocket and audio codec capabilities. MiniApps implement application protocols such as XiaoZhi.",
+  "json": {
+    "permission": "none",
+    "functions": [
+      {
+        "name": "passport.json.decode",
+        "arguments": [
+          "UTF-8 JSON string <=8192 bytes"
+        ],
+        "returns": "Lua value or nil,error",
+        "limits": "depth <=8, <=256 values, string <=2048 bytes, reject duplicate keys and non-finite numbers"
+      },
+      {
+        "name": "passport.json.encode",
+        "arguments": [
+          "Lua value"
+        ],
+        "returns": "UTF-8 JSON string or nil,error",
+        "limits": "depth <=8, <=256 values, output <=8192 bytes, string keys only, reject cycles and non-finite numbers"
+      }
+    ]
+  },
+  "http": {
+    "permission": "network.fetch",
+    "functions": [
+      {
+        "name": "passport.http.request",
+        "arguments": [
+          "method: GET|POST",
+          "HTTPS URL",
+          "optional request headers",
+          "optional UTF-8 body <=2048 bytes"
+        ],
+        "returns": "queued boolean",
+        "completion": "on_http(status, body)",
+        "limits": "manifest domain allowlist, TLS verification, up to 8 app headers and 1024 aggregate header bytes, response <=8192 bytes; reject CR/LF, Host, Content-Length, Transfer-Encoding, and Connection headers"
+      }
+    ]
+  },
+  "identity": {
+    "permission": "device.identity",
+    "function": {
+      "name": "passport.system.public_device_identity",
+      "arguments": [],
+      "returns": "device_id (stable board ID) and client_id (stable installation UUID)",
+      "description": "User-approved, read-only identifiers for services that require device enrollment. Never returns eFuse secrets, private keys, Wi-Fi credentials, or arbitrary hardware data."
+    }
+  },
+  "websocket": {
+    "permission": "network.websocket",
+    "functions": [
+      {
+        "name": "passport.ws_connect",
+        "arguments": [
+          "WSS URL",
+          "optional request headers"
+        ],
+        "returns": "queued boolean",
+        "limits": "HTTPS/WSS, manifest domain allowlist, TLS verification, up to 4 app headers and 1024 aggregate header bytes; Host, Connection, Upgrade, and Sec-WebSocket-* headers rejected; CR/LF rejected"
+      },
+      {
+        "name": "passport.ws_send",
+        "arguments": [
+          "message bytes <=4096",
+          "binary boolean"
+        ],
+        "returns": "boolean",
+        "limits": "bounded queued send; up to 50 messages/s and 16 KiB/s per session; bounded aggregate transfer and congestion handling"
+      },
+      {
+        "name": "passport.ws_close",
+        "arguments": [],
+        "returns": "none"
+      }
+    ],
+    "receive": {
+      "callback": "on_message(bytes, opcode)",
+      "fragmentation": "OS reassembles protocol fragments into one bounded message; closes on message-size overflow or queue exhaustion",
+      "maximum_message_bytes": 4096
+    }
+  },
+  "audio": {
+    "permission": "audio.stream",
+    "functions": [
+      {
+        "name": "passport.audio.capture_start",
+        "arguments": [
+          "codec: opus",
+          "sample_rate: 16000",
+          "frame_ms: 20|40|60"
+        ],
+        "returns": "boolean",
+        "completion": "on_audio_frame(opus_bytes, timestamp_ms)",
+        "description": "OS captures from the board microphone and encodes bounded Opus frames. Raw PCM is never exposed to Lua."
+      },
+      {
+        "name": "passport.audio.capture_stop",
+        "arguments": [],
+        "returns": "boolean"
+      },
+      {
+        "name": "passport.audio.play_opus",
+        "arguments": [
+          "Opus bytes <=4096",
+          "sample_rate: 16000|24000",
+          "frame_ms: 20|40|60"
+        ],
+        "returns": "queued boolean",
+        "description": "OS decodes and plays bounded frames through the board audio codec."
+      },
+      {
+        "name": "passport.audio.play_stop",
+        "arguments": [],
+        "returns": "boolean"
+      }
+    ],
+    "lifecycle": "capture, playback and queues stop on permission revocation, disconnect, app exit, or runtime fault"
+  },
+  "ownership": {
+    "os": [
+      "WSS/TLS transport",
+      "domain and request-header validation",
+      "message framing/reassembly",
+      "bounded queues and pacing",
+      "microphone and speaker drivers",
+      "Opus codec",
+      "permission and teardown"
+    ],
+    "miniapp": [
+      "service URL/token in app-private storage",
+      "provider-specific authentication semantics",
+      "JSON handshake",
+      "application state machine",
+      "XiaoZhi audio frame envelope",
+      "text and conversation UI"
+    ]
+  },
+  "superseded_by": "sdk/passport/api-v1.json",
+  "notes": [
+    "The API v1 contract now lists the implemented runtime symbols and current limits. This historical draft is retained only as the design record; do not use it as the source of current API names or limits."
+  ]
+}

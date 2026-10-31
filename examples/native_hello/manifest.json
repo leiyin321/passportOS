@@ -1,0 +1,9 @@
+{
+  "format":"passport.app/1", "id":"org.passport.native-hello", "name":"Native ELF",
+  "version":"0.1.0", "runtime":"native-elf", "entry":"app.app.elf",
+  "target":"esp32c3", "abi":1, "trusted":true, "min_os_api":1, "data_schema":1,
+  "permissions":["ui","graphics","input","timer"],
+  "limits":{"native_exec_kib":16,"fps":10,"persistent_kib":1},
+  "display":{"mode":"standard","orientation":"portrait","navigation":"buttons"},
+  "icon":"system.app-default"
+}

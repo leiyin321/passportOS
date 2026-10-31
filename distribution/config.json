@@ -1,0 +1,6 @@
+{
+  "repository": "leiyin321/passportOS",
+  "base_url": "https://leiyin321.github.io/passportOS",
+  "release_public_key": "distribution/release-public.pem",
+  "manual_deploy_required": true
+}

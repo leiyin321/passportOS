@@ -1,0 +1,16 @@
+menu "C3 Native executable pool"
+    config NATIVE_EXEC_POOL
+        bool "Reserve a bounded executable pool while memory protection is locked"
+        depends on IDF_TARGET_ESP32C3 && ESP_SYSTEM_MEMPROT_FEATURE && ESP_SYSTEM_MEMPROT_FEATURE_LOCK
+        default n
+    config NATIVE_EXEC_POOL_KIB
+        int "Pool capacity (KiB)"
+        depends on NATIVE_EXEC_POOL
+        range 8 64
+        default 16
+    config NATIVE_EXEC_PROBE
+        int "Protection fault probe: 0=normal, 1=heap execute, 2=OS text write"
+        depends on NATIVE_EXEC_POOL
+        range 0 2
+        default 0
+endmenu

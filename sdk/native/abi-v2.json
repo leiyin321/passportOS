@@ -1,0 +1,111 @@
+{
+  "format": "passport.native-abi/2",
+  "abi": 2,
+  "minimum_firmware": "1.0.35",
+  "target": "esp32c3",
+  "header": "sdk/native/include/passport_native_v2.h",
+  "host_bytes_ilp32": 80,
+  "app_bytes_ilp32": 20,
+  "extends": "passport.native-abi/1",
+  "services": [
+    "network_ready",
+    "http_request",
+    "ws_open",
+    "ws_send",
+    "ws_connected",
+    "ws_close",
+    "json_get",
+    "identity",
+    "storage_get",
+    "storage_set",
+    "audio_mode",
+    "audio_play_opus"
+  ],
+  "extra_events": {
+    "permission": 7,
+    "audio_error": 8
+  },
+  "data_kinds": {
+    "http": 1,
+    "ws_text": 2,
+    "ws_binary": 3,
+    "audio_opus": 4
+  },
+  "callback_ownership": "borrowed data valid only until callback returns; foreground app context",
+  "http_methods": [
+    "GET",
+    "POST"
+  ],
+  "http_body_max": 2048,
+  "headers_max": 1024,
+  "ws_frame_max": 2048,
+  "audio_capture": {
+    "codec": "opus",
+    "sample_rate": 16000,
+    "channels": 1,
+    "frame_duration_ms": 60,
+    "internal_encode_frame_ms": 20,
+    "wire_packet_ms": 60
+  },
+  "audio_mode": {
+    "capture": 1,
+    "playback_only": 0,
+    "close_session": -1
+  },
+  "sandbox": false,
+  "publisher_policy": "built-in OS publisher only",
+  "recommended_firmware": "1.0.45",
+  "optional_extensions": {
+    "bluetooth_hid": {
+      "minimum_firmware": "1.0.47",
+      "header": "sdk/native/include/passport_native_hid.h",
+      "host_bytes_ilp32": 96,
+      "permission": "bluetooth.hid",
+      "native_only": true,
+      "services": [
+        "hid_start",
+        "hid_state",
+        "hid_report",
+        "hid_stop"
+      ]
+    },
+    "media": {
+      "minimum_firmware": "1.0.51",
+      "header": "sdk/native/include/passport_native_media.h",
+      "host_bytes_ilp32": 120,
+      "prefix_bytes_ilp32": 96,
+      "permissions": [
+        "audio.playback",
+        "network.fetch"
+      ],
+      "native_only": true,
+      "services": [
+        "media_play",
+        "media_stop",
+        "media_state",
+        "media_volume",
+        "wall_time",
+        "battery_percent"
+      ],
+      "states": {
+        "idle": 0,
+        "buffering": 1,
+        "playing": 2,
+        "stopping": 3,
+        "failed": 4,
+        "ended": 5
+      },
+      "codec": "MP3 Layer III",
+      "microphone_consent_required": false,
+      "recommended_firmware": "1.0.59",
+      "public_http": {
+        "permission": "audio.http",
+        "minimum_firmware": "1.0.56",
+        "port": 80,
+        "public_ipv4_only": true,
+        "exact_manifest_domain_required": true,
+        "query_and_credentials_allowed": false
+      }
+    }
+  }
+}

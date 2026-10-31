@@ -1,0 +1,9 @@
+{
+  "format":"passport.app/1","id":"org.passport.bluetooth-peripheral","name":"Bluetooth Peripherals",
+  "version":"0.1.4","runtime":"native-elf","entry":"app.app.elf","target":"esp32c3","abi":2,
+  "trusted":true,"min_os_api":1,"data_schema":1,
+  "permissions":["ui","graphics","input","timer","bluetooth.hid"],
+  "limits":{"native_exec_kib":16,"fps":20,"persistent_kib":1},
+  "display":{"mode":"standard","orientation":"portrait","navigation":"buttons"},
+  "icon":"system.app-default"
+}

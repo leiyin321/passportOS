@@ -1,0 +1,36 @@
+{
+  "format": "passport.ui/1",
+  "title": "Pocket Counter",
+  "state": {
+    "count": 0
+  },
+  "ui": [
+    {
+      "type": "text",
+      "bind": "count"
+    },
+    {
+      "type": "text",
+      "text": "UP +1 / DOWN -1 / OK Save"
+    },
+    {
+      "type": "text",
+      "bind": "_status"
+    }
+  ],
+  "actions": {
+    "up": {
+      "type": "increment",
+      "field": "count"
+    },
+    "down": {
+      "type": "increment",
+      "field": "count",
+      "amount": -1
+    },
+    "ok": {
+      "type": "save",
+      "field": "count"
+    }
+  }
+}

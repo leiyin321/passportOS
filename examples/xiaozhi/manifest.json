@@ -1,0 +1,38 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.xiaozhi",
+  "name": "XiaoZhi AI",
+  "version": "0.2.8",
+  "runtime": "lua",
+  "entry": "main.lua",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "graphics",
+    "input",
+    "timer",
+    "storage.private",
+    "network.fetch",
+    "network.websocket",
+    "audio.features",
+    "audio.stream",
+    "device.identity"
+  ],
+  "domains": [
+    "api.tenclass.net"
+  ],
+  "limits": {
+    "script_heap_kib": 64,
+    "fps": 10,
+    "persistent_kib": 4
+  },
+  "icon": "system.app-default",
+  "display": {
+    "mode": "fullscreen",
+    "orientation": "portrait",
+    "navigation": "buttons",
+    "design_width": 240,
+    "design_height": 320
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.icon-gallery",
+  "name": "Icon Gallery",
+  "version": "1.0.0",
+  "runtime": "lua",
+  "entry": "main.lua",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "graphics",
+    "input",
+    "timer",
+    "storage.private"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 20,
+    "persistent_kib": 4,
+    "image_cache_kib": 8
+  },
+  "icon": "system.app-default",
+  "assets": [
+    {
+      "id": "masks/test",
+      "source": "assets/mask.svg",
+      "width": 24,
+      "height": 24,
+      "encoding": "A1",
+      "kind": "mask"
+    }
+  ]
+}

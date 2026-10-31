@@ -1,0 +1,495 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:passport:manifest:1",
+  "title": "Passport MiniApp Manifest v1 (authoring and packaged forms)",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "name",
+    "version",
+    "runtime",
+    "entry",
+    "min_os_api",
+    "data_schema",
+    "permissions",
+    "limits"
+  ],
+  "properties": {
+    "format": {
+      "const": "passport.app/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 63,
+      "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "publisher_key_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "runtime": {
+      "enum": [
+        "lua",
+        "declarative",
+        "native-elf"
+      ]
+    },
+    "entry": {
+      "enum": [
+        "main.lua",
+        "ui.json",
+        "app.app.elf"
+      ]
+    },
+    "min_os_api": {
+      "const": 1
+    },
+    "data_schema": {
+      "const": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "permissions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "ui",
+          "graphics",
+          "input",
+          "timer",
+          "storage.private",
+          "network.fetch",
+          "network.websocket",
+          "audio.features",
+          "audio.stream",
+          "device.identity",
+          "bluetooth.hid",
+          "audio.playback",
+          "audio.http"
+        ]
+      }
+    },
+    "domains": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "maxLength": 127,
+        "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)+$"
+      }
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "fps",
+        "persistent_kib"
+      ],
+      "properties": {
+        "script_heap_kib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "fps": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "persistent_kib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "image_cache_kib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "native_exec_kib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        }
+      },
+      "additionalProperties": false
+    },
+    "icon": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "assets": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/sourceAsset"
+          },
+          {
+            "$ref": "#/$defs/compiledAsset"
+          }
+        ]
+      }
+    },
+    "display": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "standard",
+            "fullscreen"
+          ]
+        },
+        "orientation": {
+          "const": "portrait"
+        },
+        "navigation": {
+          "enum": [
+            "buttons",
+            "scroll",
+            "select",
+            "game"
+          ]
+        },
+        "design_width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 240
+        },
+        "design_height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 320
+        }
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "const": "esp32c3"
+    },
+    "abi": {
+      "type": "integer",
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "trusted": {
+      "const": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "const": "lua"
+          }
+        },
+        "required": [
+          "runtime"
+        ]
+      },
+      "then": {
+        "properties": {
+          "entry": {
+            "const": "main.lua"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "const": "declarative"
+          }
+        },
+        "required": [
+          "runtime"
+        ]
+      },
+      "then": {
+        "properties": {
+          "entry": {
+            "const": "ui.json"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "const": "native-elf"
+          }
+        },
+        "required": [
+          "runtime"
+        ]
+      },
+      "then": {
+        "required": [
+          "target",
+          "abi",
+          "trusted"
+        ],
+        "properties": {
+          "entry": {
+            "const": "app.app.elf"
+          },
+          "limits": {
+            "required": [
+              "native_exec_kib"
+            ],
+            "properties": {
+              "script_heap_kib": false
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "limits": {
+            "required": [
+              "script_heap_kib"
+            ],
+            "properties": {
+              "native_exec_kib": false
+            }
+          },
+          "target": false,
+          "abi": false,
+          "trusted": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "permissions": {
+            "contains": {
+              "enum": [
+                "bluetooth.hid",
+                "audio.playback",
+                "audio.http"
+              ]
+            }
+          }
+        },
+        "required": [
+          "permissions"
+        ]
+      },
+      "then": {
+        "properties": {
+          "runtime": {
+            "const": "native-elf"
+          },
+          "abi": {
+            "const": 2
+          }
+        },
+        "required": [
+          "abi"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "const": "native-elf"
+          },
+          "abi": {
+            "const": 1
+          }
+        },
+        "required": [
+          "runtime",
+          "abi"
+        ]
+      },
+      "then": {
+        "properties": {
+          "permissions": {
+            "items": {
+              "enum": [
+                "ui",
+                "graphics",
+                "input",
+                "timer"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "permissions": {
+            "contains": {
+              "const": "audio.http"
+            }
+          }
+        },
+        "required": [
+          "permissions"
+        ]
+      },
+      "then": {
+        "properties": {
+          "permissions": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": "audio.playback"
+                }
+              },
+              {
+                "contains": {
+                  "const": "network.fetch"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "assetId": {
+      "type": "string",
+      "maxLength": 48,
+      "pattern": "^[a-z0-9]+(?:[/_-][a-z0-9]+)*$"
+    },
+    "sourceAsset": {
+      "type": "object",
+      "required": [
+        "id",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/assetId"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 96
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 96
+        },
+        "encoding": {
+          "enum": [
+            "auto",
+            "A1",
+            "A4",
+            "I4",
+            "I8",
+            "RGB565"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "sprite",
+            "app-icon",
+            "mask"
+          ]
+        },
+        "no_dither": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "compiledAsset": {
+      "type": "object",
+      "required": [
+        "id",
+        "offset",
+        "size",
+        "format",
+        "width",
+        "height",
+        "stride",
+        "palette_count",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/assetId"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 24,
+          "maximum": 16384
+        },
+        "format": {
+          "enum": [
+            "A1",
+            "A4",
+            "I4",
+            "I8",
+            "RGB565"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 96
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 96
+        },
+        "stride": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 192
+        },
+        "palette_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 256
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

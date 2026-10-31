@@ -1,0 +1,266 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.appstore-grid",
+  "name": "Appstore Grid",
+  "version": "1.0.0",
+  "runtime": "lua",
+  "entry": "main.lua",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "graphics",
+    "input",
+    "timer",
+    "storage.private"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 20,
+    "persistent_kib": 4,
+    "image_cache_kib": 16
+  },
+  "icon": "system.app-default",
+  "assets": [
+    {
+      "id": "icons/item-00",
+      "source": "assets/icon-00.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-01",
+      "source": "assets/icon-01.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-02",
+      "source": "assets/icon-02.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-03",
+      "source": "assets/icon-03.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-04",
+      "source": "assets/icon-04.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-05",
+      "source": "assets/icon-05.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-06",
+      "source": "assets/icon-06.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-07",
+      "source": "assets/icon-07.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-08",
+      "source": "assets/icon-08.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-09",
+      "source": "assets/icon-09.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-10",
+      "source": "assets/icon-10.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-11",
+      "source": "assets/icon-11.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-12",
+      "source": "assets/icon-12.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-13",
+      "source": "assets/icon-13.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-14",
+      "source": "assets/icon-14.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-15",
+      "source": "assets/icon-15.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-16",
+      "source": "assets/icon-16.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-17",
+      "source": "assets/icon-17.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-18",
+      "source": "assets/icon-18.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-19",
+      "source": "assets/icon-19.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-20",
+      "source": "assets/icon-20.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-21",
+      "source": "assets/icon-21.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-22",
+      "source": "assets/icon-22.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-23",
+      "source": "assets/icon-23.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-24",
+      "source": "assets/icon-24.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-25",
+      "source": "assets/icon-25.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-26",
+      "source": "assets/icon-26.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-27",
+      "source": "assets/icon-27.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-28",
+      "source": "assets/icon-28.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    },
+    {
+      "id": "icons/item-29",
+      "source": "assets/icon-29.png",
+      "width": 48,
+      "height": 48,
+      "encoding": "I4",
+      "kind": "app-icon"
+    }
+  ]
+}

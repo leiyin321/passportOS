@@ -1,0 +1,25 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.ws-chat",
+  "name": "Ws-Chat",
+  "version": "1.0.0",
+  "runtime": "lua",
+  "entry": "main.lua",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "input",
+    "network.websocket"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 20,
+    "persistent_kib": 4
+  },
+  "display": {
+    "mode": "standard",
+    "orientation": "portrait",
+    "navigation": "select"
+  }
+}

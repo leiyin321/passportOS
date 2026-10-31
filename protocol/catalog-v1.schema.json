@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:passport:catalog:1",
+  "title": "Passport MiniApp Catalog v1",
+  "type": "object",
+  "required": [
+    "format",
+    "apps"
+  ],
+  "properties": {
+    "format": {
+      "const": "passport.catalog/1"
+    },
+    "apps": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "publisher_key_id",
+          "permissions",
+          "icon",
+          "package_format",
+          "features",
+          "name",
+          "url",
+          "sha256",
+          "size"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 63,
+            "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$"
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+          },
+          "publisher_key_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{16}$"
+          },
+          "permissions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "ui",
+                "graphics",
+                "input",
+                "timer",
+                "storage.private",
+                "network.fetch",
+                "network.websocket",
+                "audio.features",
+                "audio.stream",
+                "device.identity",
+                "bluetooth.hid",
+                "audio.playback",
+                "audio.http"
+              ]
+            }
+          },
+          "icon": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "package_format": {
+            "enum": [
+              1,
+              2
+            ]
+          },
+          "features": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "maxLength": 32
+            }
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 262144
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

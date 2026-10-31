@@ -1,0 +1,20 @@
+{
+  "format": "passport.app/1",
+  "id": "org.passport.counter",
+  "name": "Counter",
+  "version": "1.0.0",
+  "runtime": "declarative",
+  "entry": "ui.json",
+  "min_os_api": 1,
+  "data_schema": 1,
+  "permissions": [
+    "ui",
+    "input",
+    "storage.private"
+  ],
+  "limits": {
+    "script_heap_kib": 32,
+    "fps": 20,
+    "persistent_kib": 4
+  }
+}

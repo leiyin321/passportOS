@@ -1,0 +1,50 @@
+name: Verify and optionally deploy Passport distribution
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Reviewed release containing passport-distribution.zip
+        required: true
+        type: string
+      deploy:
+        description: Deploy after verification (also requires PASSPORT_PUBLISH_ENABLED=true)
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: passport-pages
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Download reviewed release inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern passport-distribution.zip --dir incoming
+      - name: Rebuild and verify static site
+        run: |
+          python3 tools/passport/pages.py extract incoming/passport-distribution.zip build/incoming
+          python3 tools/passport/pages.py build --firmware build/incoming/updates --packages build/incoming/apps --selection build/incoming/apps/index.json --public distribution/release-public.pem --output build/pages
+      - name: Upload reviewable Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: build/pages
+  deploy:
+    if: ${{ inputs.deploy && vars.PASSPORT_PUBLISH_ENABLED == 'true' && github.ref == 'refs/heads/main' }}
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy verified static artifact
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

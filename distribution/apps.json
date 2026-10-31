@@ -1,0 +1,8 @@
+{
+  "format": "passport.selection/1",
+  "apps": [
+    {"id":"org.passport.bluetooth-peripheral","version":"0.1.4","file":"bluetooth-peripheral-0.1.4.pap"},
+    {"id":"org.passport.city-radio","version":"0.1.2","file":"city-radio-0.1.2.pap"},
+    {"id":"org.passport.xiaozhi-native","version":"1.0.4","file":"xiaozhi-native-1.0.4.pap"}
+  ]
+}

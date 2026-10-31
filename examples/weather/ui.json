@@ -1,0 +1,104 @@
+{
+  "format": "passport.ui/1",
+  "title": "Weather",
+  "state": {
+    "city": {
+      "name": "Shanghai",
+      "latitude": 31.23,
+      "longitude": 121.47
+    },
+    "index": 0
+  },
+  "cities": [
+    {
+      "name": "Shanghai",
+      "latitude": 31.23,
+      "longitude": 121.47
+    },
+    {
+      "name": "Beijing",
+      "latitude": 39.9,
+      "longitude": 116.41
+    }
+  ],
+  "datasource": {
+    "url": "https://api.open-meteo.com/v1/forecast?latitude={city.latitude}&longitude={city.longitude}&current=temperature_2m,weather_code",
+    "fields": [
+      "current.temperature_2m",
+      "current.weather_code",
+      "current.time"
+    ]
+  },
+  "ui": [
+    {
+      "type": "text",
+      "label": "Viewport: ",
+      "bind": "display.width"
+    },
+    {
+      "type": "text",
+      "bind": "city.name"
+    },
+    {
+      "type": "text",
+      "label": "Temperature C: ",
+      "bind": "response.current.temperature_2m"
+    },
+    {
+      "type": "text",
+      "label": "Weather code: ",
+      "bind": "response.current.weather_code"
+    },
+    {
+      "type": "text",
+      "bind": "response.current.time"
+    },
+    {
+      "type": "text",
+      "bind": "_status"
+    },
+    {
+      "type": "text",
+      "text": "UP/DOWN city / OK refresh"
+    },
+    {
+      "type": "icon",
+      "name": "system.cloud",
+      "size": 24,
+      "x": 165,
+      "y": 10
+    }
+  ],
+  "actions": {
+    "up": [
+      {
+        "type": "select",
+        "field": "city",
+        "options": "cities",
+        "index": "index",
+        "step": -1
+      },
+      {
+        "type": "fetch"
+      }
+    ],
+    "down": [
+      {
+        "type": "select",
+        "field": "city",
+        "options": "cities",
+        "index": "index",
+        "step": 1
+      },
+      {
+        "type": "fetch"
+      }
+    ],
+    "ok": {
+      "type": "fetch"
+    }
+  },
+  "on_start": {
+    "type": "fetch"
+  }
+}
