@@ -1,4 +1,4 @@
-#include "features.h"
+#include "ps_audio_features.h"
 #include <math.h>
 float ps_audio_rms_percent(const int16_t *samples, size_t count) {
   if (!samples || !count)

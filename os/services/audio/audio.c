@@ -6,7 +6,7 @@
 #include "esp_opus_dec.h"
 #include "esp_opus_enc.h"
 #include "esp_timer.h"
-#include "features.h"
+#include "ps_audio_features.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
