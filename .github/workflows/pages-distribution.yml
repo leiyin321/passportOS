@@ -26,9 +26,12 @@ jobs:
           RELEASE_TAG: ${{ inputs.release_tag }}
         run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern passport-distribution.zip --dir incoming
       - name: Rebuild and verify static site
+        env:
+          PAGES_BASE_URL: ${{ vars.PASSPORT_DISTRIBUTION_URL }}
         run: |
           python3 tools/passport/pages.py extract incoming/passport-distribution.zip build/incoming
-          python3 tools/passport/pages.py build --firmware build/incoming/updates --packages build/incoming/apps --selection build/incoming/apps/index.json --public distribution/release-public.pem --output build/pages
+          python3 tools/passport/pages.py history --base-url "$PAGES_BASE_URL" --public distribution/release-public.pem --output build/history
+          python3 tools/passport/pages.py build --previous build/history --firmware build/incoming/updates --packages build/incoming/apps --selection build/incoming/apps/index.json --public distribution/release-public.pem --output build/pages
       - name: Upload reviewable Pages artifact
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:

@@ -37,6 +37,22 @@ class Distribution(unittest.TestCase):
             archive=root/'release.zip';pages.bundle(site,archive);pages.extract(archive,root/'inputs')
             pages.build(root/'inputs/updates',root/'inputs/apps',root/'inputs/apps/index.json',public,[public],root/'rebuilt')
             self.assertEqual((site/'apps/index.json').read_bytes(),(root/'rebuilt/apps/index.json').read_bytes())
+            # A new release retains the prior signed image, and cannot roll back.
+            image.write_bytes(b'\xe9'+b'Y'*8191)
+            publish_firmware(image,'2.0.1',2,key,public,root/'next-updates')
+            pages.build(root/'next-updates',root,selection,public,[public],root/'next-site',previous=site)
+            self.assertTrue((root/'next-site/updates/passport-os-2.0.0.bin').is_file())
+            with self.assertRaises(ValueError):pages.build(root/'updates',root,selection,public,[public],root/'rollback',previous=root/'next-site')
+
+            manifest['version']='1.0.1'
+            (app/'manifest.json').write_text(json.dumps(manifest))
+            pap2=root/'demo2.pap';pap2.write_bytes(pack(app,key,public))
+            selection2=root/'selection2.json';selection2.write_text(json.dumps({'apps':[dict(id='org.test.demo',version='1.0.1',file='demo2.pap')]}))
+            pages.build(root/'next-updates',root,selection2,public,[public],root/'new-app-site',previous=site)
+            self.assertTrue((root/'new-app-site/apps/org.test.demo-1.0.0.pap').is_file())
+            (app/'main.lua').write_text('function on_start() end -- changed')
+            pap2.write_bytes(pack(app,key,public))
+            with self.assertRaises(ValueError):pages.build(root/'next-updates',root,selection2,public,[public],root/'mutable-app',previous=root/'new-app-site')
             with self.assertRaises(ValueError):pages.build(root/'updates',root,selection,public,[public],site)
             pap.write_bytes(pap.read_bytes()[:-1]+b'!')
             with self.assertRaises(ValueError):pages.build(root/'updates',root,selection,public,[public],root/'corrupt')

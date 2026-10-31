@@ -25,7 +25,7 @@ def regular(directory, name):
     return path
 
 
-def build(firmware, packages, selection, public, app_keys, output, initial=None):
+def build(firmware, packages, selection, public, app_keys, output, initial=None, previous=None):
     output = Path(output)
     if output.exists():
         raise ValueError('output must be a new directory; previous site remains intact')
@@ -76,6 +76,45 @@ def build(firmware, packages, selection, public, app_keys, output, initial=None)
             if len(data) not in (0x20000 + image.stat().st_size, 0x800000) or data[0x20000:0x20000+image.stat().st_size] != image.read_bytes():
                 raise ValueError('initial image does not contain the verified OTA application')
             (site / 'downloads').mkdir(); (site / 'downloads/PassportOS-initial-system.bin').write_bytes(data)
+        # Retain two previous signed OS images, so deployment does not break
+        # clients that already fetched the previous latest.json.
+        history=[]
+        if previous and (Path(previous)/'updates/latest.json').is_file():
+            old=Path(previous)/'updates'
+            candidates=[old/'latest.json',*old.glob('previous-*.json')]
+            verified=[verify_firmware_manifest(p.read_bytes(),public) for p in candidates]
+            seen=set()
+            for m in sorted(verified,key=lambda m:m['build'],reverse=True):
+                if m['build']>manifest['build']:raise ValueError('cannot replace a newer public release')
+                if m['version']==manifest['version']:
+                    if m!=manifest:raise ValueError('public version is immutable')
+                    continue
+                if m['version'] in seen or len(history)>=2:continue
+                if m['image']==manifest['image']:raise ValueError('versioned image filename reused')
+                raw=regular(old,m['image']).read_bytes()
+                verify_firmware_manifest(json.dumps(m),public,raw)
+                seen.add(m['version']);name='previous-'+m['version']+'.json'
+                (site/'updates'/name).write_text(json.dumps(m)+'\n')
+                (site/'updates'/m['image']).write_bytes(raw);history.append(name)
+        (site/'updates/history.json').write_text(json.dumps(history)+'\n')
+        # Retain one prior package version per still-published ID.
+        app_history=[]
+        if previous and (Path(previous)/'apps/index.json').is_file():
+            old=Path(previous)/'apps';old_entries=json.loads((old/'index.json').read_text())['apps']
+            if (old/'history.json').is_file():old_entries+=json.loads((old/'history.json').read_text())
+            retained=set();current_files={name for _,name in files}
+            by_url={a['url']:a for a in catalog}
+            for a in old_entries:
+                if a['url'] in current_files:
+                    if a['sha256']!=by_url[a['url']]['sha256'] or a['size']!=by_url[a['url']]['size']:raise ValueError('public app version is immutable')
+                    continue
+                if a['id'] not in ids or a['id'] in retained:continue
+                raw=regular(old,a['url']).read_bytes()
+                m,_=unpack(raw,public)
+                if m['id']!=a['id'] or m['version']!=a['version'] or hashlib.sha256(raw).hexdigest()!=a['sha256'] or len(raw)!=a['size']:
+                    raise ValueError('previous package metadata mismatch')
+                (site/'apps'/a['url']).write_bytes(raw);retained.add(a['id']);app_history.append(a)
+        (site/'apps/history.json').write_text(json.dumps(app_history)+'\n')
         links = ''.join('<li><a href="apps/'+a['url']+'">'+html.escape(a['name'])+'</a> '+html.escape(a['version'])+' · '+str(a['size'])+' B</li>' for a in catalog)
         repository=json.loads((ROOT/'distribution/config.json').read_text())['repository']
         release='https://github.com/'+repository+'/releases/tag/v'+manifest['version']
@@ -126,14 +165,60 @@ def extract(bundle_path, output):
         output.mkdir(parents=True)
         archive.extractall(output)
 
+def fetch_history(base_url,public,output):
+    import urllib.request
+    import urllib.error
+    from urllib.parse import urlsplit
+    base_url=base_url.rstrip('/')+'/'
+    if urlsplit(base_url).scheme!='https':raise ValueError('history requires HTTPS')
+    output=Path(output)
+    if output.exists():raise ValueError('history destination must be new')
+    def get(path,optional=False):
+        try:
+            with urllib.request.urlopen(base_url+path,timeout=90) as response:
+                data=response.read(3_000_001)
+                if len(data)>3_000_000:raise ValueError('history payload too large')
+                return data
+        except urllib.error.HTTPError as error:
+            if optional and error.code==404:return None
+            raise
+    latest=get('updates/latest.json',True)
+    output.mkdir(parents=True)
+    if latest is None:return
+    (output/'updates').mkdir();(output/'apps').mkdir()
+    names=['latest.json'];history=get('updates/history.json',True)
+    if history:
+        records=json.loads(history)
+        if not isinstance(records,list) or len(records)>2:raise ValueError('invalid history')
+        names+=records
+    for name in names:
+        if Path(name).name!=name or not name.endswith('.json'):raise ValueError('invalid history name')
+        raw=latest if name=='latest.json' else get('updates/'+name)
+        m=verify_firmware_manifest(raw,public);image=get('updates/'+m['image'])
+        verify_firmware_manifest(raw,public,image)
+        (output/'updates'/name).write_bytes(raw);(output/'updates'/m['image']).write_bytes(image)
+    catalog=get('apps/index.json');entries=json.loads(catalog)['apps'];older=get('apps/history.json',True)
+    previous=json.loads(older) if older else []
+    if len(entries)>8 or len(previous)>8:raise ValueError('invalid app history')
+    for a in entries+previous:
+        name=a['url']
+        if Path(name).name!=name:raise ValueError('invalid historical package name')
+        raw=get('apps/'+name);m,_=unpack(raw,public)
+        if m['id']!=a['id'] or m['version']!=a['version'] or len(raw)!=a['size'] or hashlib.sha256(raw).hexdigest()!=a['sha256']:raise ValueError('invalid app history')
+        (output/'apps'/name).write_bytes(raw)
+    (output/'apps/index.json').write_bytes(catalog)
+    (output/'apps/history.json').write_text(json.dumps(previous))
+
 if __name__ == '__main__':
     p=argparse.ArgumentParser(description=__doc__); sub=p.add_subparsers(dest='command',required=True)
     b=sub.add_parser('build');b.add_argument('--firmware',required=True);b.add_argument('--packages',required=True)
     b.add_argument('--selection',required=True);b.add_argument('--public',required=True)
-    b.add_argument('--app-key',action='append',default=[]);b.add_argument('--output',required=True);b.add_argument('--initial')
+    b.add_argument('--app-key',action='append',default=[]);b.add_argument('--output',required=True);b.add_argument('--initial');b.add_argument('--previous')
     z=sub.add_parser('bundle');z.add_argument('site');z.add_argument('output')
     x=sub.add_parser('extract');x.add_argument('bundle');x.add_argument('output')
+    h=sub.add_parser('history');h.add_argument('--base-url',required=True);h.add_argument('--public',required=True);h.add_argument('--output',required=True)
     a=p.parse_args()
-    if a.command=='build': print(json.dumps(build(a.firmware,a.packages,a.selection,a.public,a.app_key or [a.public],a.output,a.initial)))
+    if a.command=='build': print(json.dumps(build(a.firmware,a.packages,a.selection,a.public,a.app_key or [a.public],a.output,a.initial,a.previous)))
     elif a.command=='bundle': bundle(a.site,a.output)
-    else: extract(a.bundle,a.output)
+    elif a.command=='extract': extract(a.bundle,a.output)
+    else: fetch_history(a.base_url,a.public,a.output)

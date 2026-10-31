@@ -1173,7 +1173,7 @@ static void draw(void) {
                  "密钥指纹 ID：\n%s\n\n仅信任你认可的开发者密钥。\n\nOK：信任 / UP、DOWN：拒绝"),
              pending_key_id);
   } else if (service_pending) {
-    set_label_text(title, TXT("Approve Mac service", "批准 Mac 服务"));
+    set_label_text(title, TXT("Approve local service", "批准本地服务"));
     snprintf(text, sizeof(text),
              TXT("%s\nHTTP %u / WS %u\n\nOK: approve this endpoint\nUP/DOWN: deny",
                  "%s\nHTTP %u / WS %u\n\nOK：批准此服务\nUP/DOWN：拒绝"),
@@ -1229,11 +1229,12 @@ static void draw(void) {
       }
     } else if (focus == 1) {
       cJSON *apps = cJSON_GetObjectItemCaseSensitive(catalog, "apps");
-      if (!apps)
-        snprintf(text, sizeof(text),
-                 TXT("Mac App Store\n%s:%u\n\nOK: browse / approve service\nOffline apps remain available",
-                     "Mac 应用商店\n%s:%u\n\nOK：浏览 / 批准服务\n离线应用仍可使用"),
-                 service_ip, service_http);
+      if (!apps) {
+        if (*store_url)
+          snprintf(text,sizeof(text),"%s",TXT("App Store\n\nOK: browse apps\nOffline apps remain available", "应用商店\n\nOK：浏览应用\n离线应用仍可使用"));
+        else
+          snprintf(text,sizeof(text),TXT("Local App Store\n%s:%u\n\nOK: browse / approve service\nOffline apps remain available", "本地应用商店\n%s:%u\n\nOK：浏览 / 批准服务\n离线应用仍可使用"),service_ip,service_http);
+      }
       else {
         int count = cJSON_GetArraySize(apps);
         for (int i = 0; i < count && i < 8; i++) {

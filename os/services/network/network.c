@@ -339,7 +339,7 @@ static void worker(void *arg) {
     if (!j)
       continue;
     wifi_ps_type_t saved_ps=WIFI_PS_NONE;
-    bool restore_ps=j->media && esp_wifi_get_ps(&saved_ps)==ESP_OK &&
+    bool restore_ps=(j->media || j->stream || j->download) && esp_wifi_get_ps(&saved_ps)==ESP_OK &&
                     saved_ps!=WIFI_PS_NONE && esp_wifi_set_ps(WIFI_PS_NONE)==ESP_OK;
     ps_net_result result = {.generation = j->generation, .status = -1};
     const char *failure_stage = "policy";
@@ -356,7 +356,7 @@ static void worker(void *arg) {
       }
     } else if (permitted && (!strcmp(j->ep.scheme, "http") ||
                              !strcmp(j->ep.scheme, "https"))) {
-      int64_t deadline = esp_timer_get_time() + (j->media ? 86400000000LL : j->stream ? 900000000 : 8000000);
+      int64_t deadline = esp_timer_get_time() + (j->media ? 86400000000LL : j->stream ? 900000000 : j->system ? 120000000 : 8000000);
       size_t limit = j->stream ? j->expected_size : j->download ? PS_PAP_MAX :
                      j->custom_http ? 8192 : j->system ? 12288 : 4096;
       // Keep response storage out of the TLS handshake peak. Grow it only

@@ -141,9 +141,11 @@ int xTaskCreate(void (*f)(void *), const char *n, unsigned s, void *a,
     *(TaskHandle_t *)t = (void *)1;
   return 1;
 }
+static int64_t clock_offset, open_delay;
 int64_t esp_timer_get_time(void) {
   static int64_t t;
-  return t += 100;
+  t += 100;
+  return t + clock_offset;
 }
 const char *esp_err_to_name(int r) { return r ? "FAIL" : "OK"; }
 int esp_crt_bundle_attach(void *c) {
@@ -220,6 +222,7 @@ int esp_http_client_set_header(esp_http_client_handle_t h, const char *n,
   return 0;
 }
 int esp_http_client_open(esp_http_client_handle_t h, int n) {
+  clock_offset += open_delay;
   (void)h;
   (void)n;
   return 0;
@@ -326,6 +329,8 @@ static void run(void) {
 }
 static void reset(void) {
   assert(!blocks);
+  clock_offset = open_delay = 0;
+  ps_changes = 0;
   metadata_interval = NULL;
   memset(responses, 0, sizeof(responses));
   opened = reads = writes = allocations = 0;
@@ -448,11 +453,27 @@ int main(void) {
   run();
   assert(ps_net_poll(&r));
   assert(r.status == 200 && r.size == 2 && sink_bytes == 2 && !blocks);
+  assert(current_ps == WIFI_PS_MIN_MODEM && ps_changes == 2);
   reset();
   assert(ps_net_fetch_stream("https://api.example.com/app.bin", 2, sink,
                              (void *)1, 8));
   run();
   assert(ps_net_poll(&r));
+  assert(r.status == -1 && !blocks);
+  reset();
+  assert(current_ps == WIFI_PS_MIN_MODEM && ps_changes == 0);
+  reset();
+  assert(ps_net_set_store("https://api.example.com/index.json"));
+  open_delay = 9000000;
+  assert(ps_net_fetch(NULL, "https://api.example.com/start", 12, true));
+  run();
+  assert(ps_net_poll(&r));
+  assert(r.status == 200 && r.size == 2);
+  bounded_free(r.data);
+  assert(!blocks);
+  reset();
+  open_delay = 9000000;
+  r = request(&p, "GET", NULL);
   assert(r.status == -1 && !blocks);
   reset();
   job *dummy = NULL;
