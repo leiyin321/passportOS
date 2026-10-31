@@ -24,3 +24,5 @@ dist/
 .DS_Store
 
 *.egg-info/
+
+/examples/*/app.app.elf

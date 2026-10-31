@@ -2,6 +2,8 @@
 
 # 固件交付与恢复
 
+当前 Pages、社区首次安装镜像及 Native 优先发布请使用[分发指南](../../distribution/README.zh_CN.md)。下文为较早的本地开发包流程，首次安装不要求先回读原固件。
+
 本地发布目录为 `build/release/`。激活 IDF5.5.3 后，用
 `python tools/passport/release.py build/firmware/<SHA256>` 从已验证归档重新生成。
 归档保留匹配的 ELF/MAP、镜像和清单。执行

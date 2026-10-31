@@ -1,18 +1,19 @@
-<p align="right">
-  <a href="CI-sync-main.zh_CN.md">简体中文</a> · <strong>English</strong>
-</p>
+<p align="right"><a href="CI-sync-main.zh_CN.md">简体中文</a> · <strong>English</strong></p>
 
-# Upstream Synchronization
+# Optional upstream synchronization
 
-`.github/workflows/sync-main.yml` synchronizes a fork's `main` branch with `FoloToy/ai-passport:main`. It runs daily at 00:00 UTC and by manual dispatch, and is skipped when the repository is not a fork.
+Passport OS `main` is the OS product, not the upstream hardware demo branch.
+`.github/workflows/sync-main.yml` has no scheduled trigger. It runs only by manual
+dispatch on a GitHub fork with `PASSPORT_UPSTREAM_SYNC=true`.
 
-The workflow checks out the target `main` without persisting credentials and uses the full-SHA-pinned upstream-sync Action. Its generated `GITHUB_TOKEN` has only `contents: write`; no manually configured token is required. If synchronization fails after an upstream workflow change, use GitHub's **Sync fork** once and inspect the Actions log.
+The default upstream is `leiyin321/passportOS`; a fork maintainer may explicitly set
+`PASSPORT_UPSTREAM_REPOSITORY`. Review upstream changes and any conflicts before
+opting in, especially custom trust roots, partitions and service defaults. The
+standalone public OS repository is not a GitHub fork and skips this job.
+Official `FoloToy/ai-passport` BSP updates are reviewed/cherry-picked separately;
+do not automatically replace the OS Launcher with the factory demo.
 
-Keep fork-specific firmware and documentation on feature branches so `main` stays synchronized. If development must happen directly on `main`, disable this workflow first to avoid automatic merges or conflicts. Fork owners must explicitly enable Actions after forking.
-
-The checkout explicitly sets `ref: main`, even when a manual dispatch selects
-another branch. The sync Action expects a local `main` branch before fetching;
-without that explicit checkout, `git checkout main` can interpret this
-repository's `main/` directory as a path instead of switching branches.
-
-When upgrading an Action, verify the release and full commit SHA from the official repository and update the inline version comment.
+The checkout selects `main` without persisted credentials. The pinned sync Action
+uses the generated `GITHUB_TOKEN` with `contents: write`, not a personal token.
+Fork owners must enable Actions and explicitly opt in. Inspect failures rather
+than forcing a reset or discarding local product changes.

@@ -4,6 +4,8 @@
 
 # Passport OS system updates
 
+Current public distribution uses `https://leiyin321.github.io/passportOS/updates/latest.json`. The Store uses the same Pages project under `/apps/index.json`. Defaults and fork public keys are configured through [distribution](../../distribution/README.md); saved valid endpoint overrides take precedence. Signatures remain mandatory for HTTPS and private-LAN HTTP alike.
+
 ## Installation and update boundary
 
 The first Passport OS installation still requires a USB firmware flash. Once a

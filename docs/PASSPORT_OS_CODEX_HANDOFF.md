@@ -1,6 +1,6 @@
 [简体中文 — complete original task specification](PASSPORT_OS_CODEX_HANDOFF.zh_CN.md)
 
-Latest checkpoint: OS 1.0.72 (build 2026103102), installed through Settings OTA. Storage order is OS, OTA reservation, apps/cache, data reservation, system/overhead, then app-available at the right end. Row color swatches and bar use the same palette; legend spacing follows the system font. Whole-Flash accounting remains unchanged. Complete gate and device category-order/navigation/ten-refresh checks PASS; free heap unchanged at 108,512 bytes. Application 2,422,816 bytes (77,184 below 2.5 MB). See [storage report](test-reports/firmware-size.md) for device checks and accounting limits. On 2026-10-31 the user confirmed the available-last bar and matching category swatches display normally on the physical screen. Networks/apps/bonds retained; no USB Flash writes, erase or Git writes.
+Latest checkpoint: OS 1.0.75 (signed build 2026110102), installed directly from public Pages OTA and boot validated. Source is published at https://github.com/leiyin321/passportOS; Pages https://leiyin321.github.io/passportOS serves signed OS updates and three Native apps. Local and GitHub Linux host/firmware gates, Pages deployment, all public payload signatures/hashes, latest-version check and forced Native Store reinstall PASS. Public OTA took 210.83 s; Bluetooth package reinstall 4.23 s. App 2,423,200 bytes, 76,800 below 2.5 MB. See [public acceptance](test-reports/public-distribution.md) and [distribution guide](../distribution/README.md). First-install 8 MiB image and SDK wheel are release assets; destructive spare-board first installation and community article publication remain outside this acceptance. Original worktree/upstream remote are retained; the isolated publication checkout is `local/open-source/public-repository`. No USB Flash write/erase; serial closed.
 
 Store checkpoint — 2026-10-31: legacy Lua XiaoZhi (`org.passport.xiaozhi`, 0.2.8) retired from the live catalog and download directory at user request. Three entries remain: Native XiaoZhi 1.0.4, Bluetooth Peripherals 0.1.4 and City Radio 0.1.2. HTTP catalog, old-download 404 and remaining package size/hash checks PASS. Source examples, device-installed applications and persistent data are unchanged.
 # Passport OS implementation handoff
@@ -65,9 +65,11 @@ public data → persistent counter → Tetris → offload/reinstall with saved p
 VoiceBird → authorized Mac WS → offline cached games → clean Launcher exit, without reflashing.
 Until this journey is verified, the project remains in development.
 
-## Post-stabilization GitHub collaboration and static publishing (planned)
+## GitHub collaboration and static publishing (historical plan, now implemented)
 
-Do not open the source or enable public publishing until the planned OS implementation
+Implementation: the user approved a Native-first monorepo at `leiyin321/passportOS`, local signing and manually gated Pages publication. The [distribution guide](../distribution/README.md) and [acceptance report](test-reports/public-distribution.md) supersede the historical plan below.
+
+Original precondition: do not open the source or enable public publishing until the planned OS implementation
 and device acceptance gates are complete. Before opening, audit repository history and
 artifacts for credentials, private signing keys, raw device logs and other private data.
 

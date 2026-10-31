@@ -1,6 +1,6 @@
 [English](PASSPORT_OS_CODEX_HANDOFF.md)
 
-最新检查点：OS 1.0.72（构建号 2026103102）已通过设置 OTA 安装。存储顺序统一为系统、OTA 预留、应用及缓存、数据预留、系统及开销，最后为最右侧的应用可用。每行颜色块与占用条共用配色，图例行距跟随系统字体；整片 Flash 统计口径不变。完整门禁和设备顺序/导航/十次刷新检查 PASS，空闲堆保持 108,512 字节。应用 2,422,816 字节（距 2.5 MB 余 77,184）。设备检查和统计范围见[存储报告](test-reports/firmware-size.zh_CN.md)，2026-10-31 用户确认可用空间置后的占用条及分类颜色块实屏显示正常，验收 PASS。保留网络/应用/配对，无 USB Flash 写入、擦除或 Git 写操作。
+最新检查点：OS 1.0.75（签名构建 2026110102）已直接通过公共 Pages OTA 安装并验证启动。源码 https://github.com/leiyin321/passportOS 已公开，Pages https://leiyin321.github.io/passportOS 提供签名系统更新及三个 Native 应用。本地/GitHub Linux 主机及固件门禁、Pages 部署、全部公共产物签名/哈希、最新版检查、Native 商店强制重装均 PASS。公共 OTA 210.83 秒，蓝牙包重装 4.23 秒。应用 2,423,200 字节，距 2.5 MB 余 76,800，见[公共验收](test-reports/public-distribution.zh_CN.md)和[分发指南](../distribution/README.zh_CN.md)。Release 提供 8 MiB 首次安装镜像及 SDK wheel；备用板覆盖式首次安装和社区文章发布不在本次已验收范围。原工作区/上游 remote 保留，独立发布仓库在 `local/open-source/public-repository`。无 USB Flash 写入/擦除，串口关闭。
 
 商店检查点 — 2026-10-31：按用户要求下架旧 Lua 小智（`org.passport.xiaozhi`，0.2.8），从实时索引和下载目录移除。保留 Native 小智 1.0.4、蓝牙外设 0.1.4、城市电台 0.1.2 三项。HTTP 索引、旧下载 404、其余包大小/哈希检查 PASS。保留源码示例、设备已安装应用和持久数据。
 # Passport OS — Codex 开发交接与验收任务书
@@ -235,9 +235,11 @@ BSP 音频独占归 Audio Manager；C 原生处理 RMS（16kHz 采样，约 20�
 - Desktop/Browser Simulator：240×320 三键模拟，UI/事件/Lua mock 音频 API、模拟网络/存储；必须标注其与真机行为差异。测试协议和包格式与设备端使用同一套 fixtures。
 - App Store 只负责发现和分发，不强制开发者拥有自建后端。允许 GitHub Pages 等静态发布。
 
-### OS 稳定后采用 GitHub 协作与静态发布（计划）
+### GitHub 协作与静态发布（历史计划，现已实施）
 
-在 Passport OS 完成计划内的实现和真机验收门禁前，不公开源码仓库，也不启用公开发布。
+实施结果：用户批准 Native 优先的 `leiyin321/passportOS` 单仓库、本机签名及手动控制 Pages 发布。[分发指南](../distribution/README.zh_CN.md)与[验收报告](test-reports/public-distribution.zh_CN.md)替代下述历史计划的实施安排。
+
+原前置条件：在 Passport OS 完成计划内的实现和真机验收门禁前，不公开源码仓库，也不启用公开发布。
 开源前检查 Git 历史和发布产物，清理凭据、私有签名密钥、原始设备日志及其他私有数据。
 
 - OS 与 MiniApp 均通过 GitHub PR 和 Actions 协作。优先拆分 OS 和商店目录仓库；如使用
@@ -251,8 +253,7 @@ BSP 音频独占归 Audio Manager；C 原生处理 RMS（16kHz 采样，约 20�
 
 验收：公开干净检出可复现 OS 构建和宿主测试；获批准的 OS 发布可被设备 OTA 发现并验签；
 MiniApp 贡献可生成通过校验的包和索引条目，并能通过静态 HTTPS 浏览、下载和安装；错误或
-不受信内容会被拒绝。商店静态分发不依赖动态后端。此项属于 OS 稳定后的待实现工作，不代表
-当前已具备公开协作或发布能力。
+不受信内容会被拒绝。商店静态分发不依赖动态后端。该历史计划现已按上述指南实现，当前验收状态以报告为准。
 
 ## 12. 明确开发里程碑与 Gate
 

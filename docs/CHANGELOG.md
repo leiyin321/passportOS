@@ -10,6 +10,17 @@
 > with `CHANGELOG.zh_CN.md`. The entries currently under `Unreleased` are pending
 > review for the next release; they are not a finalized release history.
 
+## Passport OS 1.0.75 — 2026-11-01
+
+- Publish Native-first OS, SDK and application sources in one repository, retaining Lua compatibility.
+- Provide signed static system updates and a curated Native App Store through GitHub Pages, with reviewed local signing and manually gated deployment.
+- Configure public/fork endpoints and trust roots; preserve persistent HTTPS Store configuration across reboot.
+- Ship an installable SDK with Native C resources, public/local development guides, community first-install image and checksum files.
+- Handle slower public downloads with bounded system deadlines and temporary Wi-Fi modem-sleep suspension; retain previous signed payloads across deployments.
+- Validate public Pages OTA, current-version checks and a forced Native package reinstall on the board. First installation on a spare board remains unverified.
+
+The following inherited baseline notes remain unreleased and are not this Passport OS release.
+
 ## Unreleased
 
 - Added the supplied 80-byte CW2017 profile for the specified 520 mAh cell, including content/update-flag checks, verified writes, the required restart sequence, and bounded SOC-readiness polling.

@@ -52,3 +52,5 @@ source <path-to-esp-idf-v5.5.3>/export.sh
 Follow the [environment bootstrap](../engineering/environment-setup.md) if ESP-IDF 5.5.3 is
 not installed. Reproduce a CI failure with the same mode locally. Do not
 maintain duplicate validation commands inside the workflow.
+
+Firmware CI also compiles every Native example as unsigned C3 ELF using `tools/passport/check_native_apps.py`, validating curated source IDs/versions. Host CI installs SDK asset dependencies before the gate. No CI validation step holds a signing key.

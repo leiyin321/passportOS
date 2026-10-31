@@ -4,6 +4,8 @@
 
 # Passport OS 系统更新
 
+当前公共更新源为 `https://leiyin321.github.io/passportOS/updates/latest.json`，商店位于同一 Pages 项目的 `/apps/index.json`。默认地址及 fork 公钥配置见[分发指南](../../distribution/README.zh_CN.md)，有效保存的地址覆盖项优先；HTTPS 和私有局域网 HTTP 均必须验签。
+
 ## 首次安装与后续升级的边界
 
 首次安装 Passport OS 仍需通过 USB 刷入固件。设备运行带系统更新服务的

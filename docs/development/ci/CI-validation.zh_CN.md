@@ -43,3 +43,5 @@ source <ESP-IDF-v5.5.3-路径>/export.sh
 
 未安装 ESP-IDF 5.5.3 时先按[环境引导](../engineering/environment-setup.zh_CN.md)搭建。CI
 失败应先在本地运行相同模式。不要在 workflow 中复制另一套构建或校验命令。
+
+固件 CI 额外通过 `tools/passport/check_native_apps.py` 将所有 Native 示例编译为无签名 C3 ELF，并检查精选源码 ID/版本；主机 CI 在门禁前安装 SDK 素材依赖，验证任务均不持有签名私钥。

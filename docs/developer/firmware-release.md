@@ -2,6 +2,8 @@
 
 # Firmware delivery and recovery
 
+For current public Pages, community first-install images and Native-first releases, use the [distribution guide](../../distribution/README.md). The commands below describe the older local developer bundle; a firmware readback is not a prerequisite for installation.
+
 Release output is local `build/release/`; regenerate from a verified archive with
 `python tools/passport/release.py build/firmware/<SHA256>` in an activated IDF5.5.3 environment.
 The archive retains matching ELF/MAP, binaries and manifest. Verify with

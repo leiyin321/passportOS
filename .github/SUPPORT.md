@@ -24,3 +24,5 @@ guaranteed.
 
 Do not post real user data, access tokens, private keys, or internal addresses
 in public issues, discussions, or logs.
+
+Passport OS issues belong to [this repository](https://github.com/leiyin321/passportOS/issues); app-backend failures belong to their providers. Include OS/app version and sanitized reproduction steps.

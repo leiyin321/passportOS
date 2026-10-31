@@ -28,6 +28,22 @@ URLs. Do not present a merged initial image as an app-only OTA file. The OTA
 manifest signature covers the application image, not every byte of the community
 image; the complete image also requires maintainer review and its published hash.
 
+## Player controls and first connection
+
+UP/DOWN moves selection; short OK confirms; double OK returns Home. Open
+Settings → Wi-Fi, press OK to start phone setup, and scan the device's Wi-Fi QR.
+After joining, the phone opens the local setup page; select a nearby 2.4 GHz
+network or enter it manually. Passport verifies the connection and closes setup.
+For this same phone's hotspot, select hotspot mode and save its name/password
+first; then enable the phone hotspot after Passport releases its setup AP.
+On compatible iPhones enable Allow Others to Join and Maximize Compatibility.
+
+Choose English/Chinese in Settings → Language. Open App Store and press OK to
+browse/install; when installed/current, OK opens the app. Settings → System
+Update checks the signed public release, shows byte/percentage progress when a
+new version exists, and offers restart only after verification. First connection
+also starts public NTP synchronization. Wi-Fi/setup works independently of Pages.
+
 ## Build the public site locally
 
 ```sh
@@ -90,7 +106,7 @@ explicitly creates a Lua app.
 3. Create a reviewed GitHub Release containing `passport-distribution.zip`.
    Keep firmware versions and build numbers monotonic; do not overwrite versions.
 4. Enable Pages with GitHub Actions and set repository variable
-   `PASSPORT_PUBLISH_ENABLED=true`. Configure the `github-pages` environment with
+   `PASSPORT_PUBLISH_ENABLED=true` and `PASSPORT_DISTRIBUTION_URL` to the HTTPS Pages base URL. Configure the `github-pages` environment with
    `main` branch protection/required reviewers as available for the account.
 5. Manually run **Verify and optionally deploy Passport distribution** for that
    release tag. Verification reconstructs the site with the repository public key.
@@ -117,3 +133,9 @@ isolation. Firmware signing-key rotation/revocation and anti-rollback beyond the
 current version/build policy are not implemented. Pages availability and app
 backend availability are separate. The project does not promise App Store-style
 sandboxing or a hosted AI backend.
+
+Deployment first downloads and verifies the currently published payloads. The site retains two previous signed OS versions and one previous package version per still-listed app; retired IDs are removed. A version cannot be replaced with different bytes, and public OS build numbers cannot decrease. If history cannot be verified, deployment stops. CDN propagation/caching and public-network throughput can delay availability; retry after propagation rather than overwriting a version.
+
+Community publication text: [reviewable draft](community-post.md). Posting is a separate maintainer action.
+
+Firmware CI also builds every Native example as an unsigned C3 ELF and checks selected source IDs/versions against the curated list. Signing remains a separate trusted maintainer step.

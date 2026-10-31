@@ -13,7 +13,7 @@
   [AI 硬件开发指南](/docs/hardware-design/AI_HARDWARE_DEVELOPMENT_GUIDE.zh_CN.md) 的完整硬件上下文。
 - 参与社区时请遵守 [`CODE_OF_CONDUCT.zh_CN.md`](/.github/CODE_OF_CONDUCT.zh_CN.md)；普通使用问题见 [`SUPPORT.zh_CN.md`](/.github/SUPPORT.zh_CN.md)。
 - 不要提交凭证、令牌、授权文件或个人数据。
-- 仓库的 `main` 分支始终与上游基线保持同步；fork 用户在 `feature/*` 分支开发功能（见 `docs/fork-guide.md`）。
+- 本仓库的 `main` 维护 Passport OS，上游 BSP 变更经人工审核合并，贡献在短期 `feature/*` 分支开发。
 
 ## 开发与验证
 

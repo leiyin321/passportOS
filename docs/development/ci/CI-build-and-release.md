@@ -1,87 +1,37 @@
-<p align="right">
-  <a href="CI-build-and-release.zh_CN.md">简体中文</a> · <strong>English</strong>
-</p>
+<p align="right"><a href="CI-build-and-release.zh_CN.md">简体中文</a> · <strong>English</strong></p>
 
-# Automated Build and Release
+# Passport OS build and release
 
-`.github/workflows/build-firmware.yml` builds and publishes firmware for tags and supports manual dispatch. Ordinary branch pushes do not trigger it. Keep this page synchronized with the workflow.
+`.github/workflows/build-firmware.yml` is manually dispatched. It builds and verifies
+ESP32-C3 firmware with ESP-IDF 5.5.3 and uploads a review artifact; it does not sign
+firmware or create a GitHub Release. `version.txt` supplies the default OS version.
+A valid `PASSPORT_OS_VERSION` build override is available for development.
 
-The build job restores ccache, runs `./tools/validate.sh --firmware` with ESP-IDF 5.5.3 for ESP32-C3, verifies the bootloader, partition table, and application at the offsets generated in `flash_args`, checks the 8 MB Flash arguments and configured partition layout, then uploads `FoloToy-AI-Passport-full.bin`. The repository default places these images at `0x0`, `0x8000`, and `0x10000`; user-defined partition tables may change the application offset. A separate least-privilege release job publishes that artifact only for a tag.
+OS tags are `v<version>`, for example `v1.0.75`. Apps have independent PAP versions,
+not separate OS firmware tags. Maintainers run the complete gate, verify the archive,
+compile/test selected apps, sign locally and create the reviewed release bundle.
+See the [distribution commands](../../../distribution/README.md).
 
-All Actions are pinned to full commit SHAs. The build job has `contents: read`; only the tag release job receives `contents: write`.
+`.github/workflows/pages-distribution.yml` is a separate manual workflow. It downloads
+a reviewed release's `passport-distribution.zip`, verifies firmware/apps with the
+committed distribution public key, retains verified previous payloads and generates
+the static site. Deployment additionally requires the deploy input, publication
+variable and `main` Pages environment policy. Signing keys are never provided to CI.
+All third-party Actions use full commit SHAs; verify pins against official repositories
+before changing them. PR checks do not deploy or sign anything.
 
-## Browser flashing
+## First installation versus updates
 
-Open `https://ai-passport.folotoy.cn/tools/web-flasher/`, connect the USB JTAG/serial device, select the release's merged `FoloToy-AI-Passport-full.bin`, choose a baud rate such as 460800, and write it from `0x0`. The browser performs local writing and verification; it does not upload the firmware file.
+The OS product layout in `partitions.csv` has dual 2.5 MiB app slots, package storage
+and independent app data. The current app starts at `0x20000`; do not use the baseline
+hardware demo's app offset. Merged build artifacts are not the complete initialized
+community image. Generate the 8 MiB first-install file with
+`tools/passport/community_image.py` from a verified archive. Flash at `0x0` only for
+first installation or an explicitly chosen complete reset; it replaces settings/data.
+Existing OS devices use Settings OTA, which writes the inactive app slot.
+An app-only OTA `.bin` must never be written at `0x0`.
 
-For board and flashing details, see [the hardware development guide](../../hardware-design/AI_HARDWARE_DEVELOPMENT_GUIDE.md).
-
-## Release title
-
-When this repository publishes firmware for several different applications from
-the same source tree, a bare version number does not tell a user which app a
-release is for. Give each tag a name that carries the version and the app, and
-make sure the release title shows both.
-
-- **Tag naming convention**: name tags as `v<version>-<app-name>` in
-  lowercase-kebab-case, e.g. `v0.1.0-voice-keychain`, `v1.0.0-pocket-pomodoro`.
-  The `<app-name>` is the application this release builds (see the
-  repository-relative `docs/reference/<username>/<app-name>/` archive naming).
-  A tag that only says a version is ambiguous when several apps share the tree.
-- **After the release is published, confirm the release title.** The workflow
-  sets the title to the tag name, so a correctly-named tag already reads
-  `v0.1.0-voice-keychain`. If the tag did not include the app, or the title is
-  not obvious at a glance, edit the release (GitHub: `Edit release`; GitLab:
-  edit the tag) so the title is `<version> <app-name>`, e.g. `v0.1.0 Voice
-  Keychain`. One quick scan of the release list should distinguish which app a
-  release is for.
-- **Keep title and tag consistent.** Use `<version>-<app-name>` so the app name
-  is visible in both the tag list and the release list. Do not rely on a
-  human-readable body alone to carry the app name.
-
-## Changelog preparation
-
-Ordinary feature, application, and documentation pull requests leave the paired
-changelog files unchanged. Before creating and pushing a release tag, the
-release maintainer:
-
-1. Identifies the previous release and reviews the pull requests merged since it,
-   together with the authoritative product and application documentation.
-2. Collects user-visible features, fixes, compatibility changes, and release-flow
-   changes. Internal refactors, CI maintenance, typo fixes, and generated-file
-   refreshes are omitted.
-3. Updates `docs/CHANGELOG.md` and `docs/CHANGELOG.zh_CN.md` together, places the
-   released entries under a `## <tag> - YYYY-MM-DD` heading, and leaves a fresh
-   `Unreleased` section before committing the release preparation.
-
-Treat any existing `Unreleased` entries as pending input: verify them against the
-merged changes and the target release instead of copying them blindly. This
-release-preparation change is the owner of the shared changelog write and must be
-part of the commit that is tagged.
-
-## Release notes
-
-A tag-triggered release succeeds only when the merged firmware and its release
-notes travel together. After the release is published, write release notes that
-explain the build to a user who may not have read the repository. Cover three
-things:
-
-- **What's new**: the features, behaviors, or fixes this release adds or
-  changes compared with the previous one. Keep it user-facing, not a commit log.
-- **How to build**: run `./tools/validate.sh --firmware` to produce and verify
-  the merged firmware, then identify `FoloToy-AI-Passport-full.bin` as the file
-  to flash from `0x0`. `idf.py build` alone performs incremental compilation;
-  it does not create or verify the merged full image and is not an alternative
-  delivery command.
-- **How to use**: how to flash the build (the browser flasher above) and the key
-  interactions or hardware requirements of the release.
-
-Write the release notes in English (and a Simplified Chinese version where the
-project is bilingual) and link them from the GitHub/GitLab release. Derive the
-user-visible summary from the release-preparation changelog so the two remain
-consistent.
-
-## Related documents
-
-- Firmware publishing to the community: [publish-to-community.md](../release/publish-to-community.md)
-- Post-release follow-up: [project-completion.md](../release/project-completion.md)
+Publication includes version, hardware target, checksums, destructive first-install
+notice and player controls. See the [community draft](../../../distribution/community-post.md)
+and [acceptance report](../../test-reports/public-distribution.md). A source build
+or a successful upload is not a physical flashing/first-boot test.

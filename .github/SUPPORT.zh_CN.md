@@ -16,3 +16,5 @@ FoloToy AI Passport 是开源硬件与固件。社区可以帮助确认可复现
 - 使用问题：用「Usage question / 使用问题」issue 模板提问。
 
 请不要在公开 issue、讨论或日志中提交真实用户数据、访问令牌、私钥或内部地址。
+
+Passport OS 问题请提交到[本仓库](https://github.com/leiyin321/passportOS/issues)，应用后端问题由相应提供者处理；请附 OS/应用版本和脱敏复现步骤。

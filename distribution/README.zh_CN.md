@@ -24,6 +24,17 @@ python tools/passport/community_image.py build/firmware/ARCHIVE_SHA build/Passpo
 手机配网和公共服务地址。不能将合并首次安装镜像当作 OTA 应用文件。
 OTA 签名只覆盖应用镜像，不覆盖社区镜像的全部字节；完整镜像还需维护者审核及公布哈希。
 
+## 玩家操作及首次联网
+
+上下键移动，短按 OK 确认，双击 OK 返回主页。进入设置 → Wi-Fi，按 OK 开始手机配网，
+扫描设备 Wi-Fi 二维码。手机接入后打开本地配网页，选择附近 2.4 GHz 网络或手动输入；
+Passport 验证连接成功后自动结束。配置同一手机的热点时，先勾选热点模式并保存名称/密码，
+等 Passport 关闭配网热点后再开启手机热点。支持的 iPhone 开启“允许其他人加入”和“最大兼容性”。
+
+设置 → 语言可选中英。打开应用商店按 OK 浏览/安装，安装完成或已是最新版时 OK 打开应用。
+设置 → 系统更新检查公共签名发布；有新版本时显示字节及百分比进度，验证完成后才允许重启。
+首次联网也会启动公共 NTP 同步。手机配网独立于 Pages 服务。
+
 ## 本地构建公共站点
 
 ```sh
@@ -76,7 +87,7 @@ passport device update-source http://LAN_IP:8765/latest.json --port SERIAL_PORT
 1. fork/分支提交**源码** PR，附测试、权限、最低 API/ABI、许可、隐私/后端及实机验收，不提交密钥。
 2. 维护者审核 Native 代码，构建测试 OS/应用，在可信本机签名，更新 `distribution/apps.json`。PR 任务无签名密钥。
 3. 创建审核后的 GitHub Release，附 `passport-distribution.zip`。版本和构建号递增，不覆盖已有版本。
-4. Pages 选择 GitHub Actions，设置仓库变量 `PASSPORT_PUBLISH_ENABLED=true`，根据账户能力为 `github-pages` 环境配置 `main` 分支限制及审核者。
+4. Pages 选择 GitHub Actions，设置仓库变量 `PASSPORT_PUBLISH_ENABLED=true`，并将 `PASSPORT_DISTRIBUTION_URL` 设为 HTTPS Pages 基地址，根据账户能力为 `github-pages` 环境配置 `main` 分支限制及审核者。
 5. 手动运行 **Verify and optionally deploy Passport distribution**，选择已审核 Release。工作流用仓库公钥重新构建验证站点，审核后勾选部署；普通 push/PR 不部署。
 6. 验证公共 HTTPS 清单、所有大小/哈希、真实设备更新、已是最新版提示、商店及真实应用下载安装。
 
@@ -93,3 +104,9 @@ Pages 任务没有私钥。保留旧签名版本供恢复，但回退发布仍�
 Native 是受信代码，可能影响 OS 稳定性，ABI 不提供进程隔离。
 暂未实现固件签名密钥轮换/吊销，也没有超出现有版本/构建号规则的防回退机制。
 Pages 与各应用后端的可用性独立；不承诺类似商业 App Store 的沙箱或托管 AI 后端。
+
+部署前下载并验证当前公共产物，保留前两个签名 OS 版本及仍上架应用的上一包版本；下架 ID 不保留。相同版本不能替换成不同内容，公共 OS 构建号不能递减。历史验证失败则停止部署。CDN 传播/缓存及公网速度会影响更新可见性，应等待传播后重试，而不是覆盖版本文件。
+
+社区发布正文：[可审核草稿](community-post.zh_CN.md)，发帖为独立的维护者操作。
+
+固件 CI 也会将所有 Native 示例编译为无签名 C3 ELF，并核对精选源码的 ID/版本；签名仍为可信维护者的独立步骤。

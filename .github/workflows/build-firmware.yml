@@ -48,4 +48,3 @@ jobs:
           name: ${{ steps.artifact_name.outputs.name }}
           path: build/FoloToy-AI-Passport-full.bin
           if-no-files-found: error
-
