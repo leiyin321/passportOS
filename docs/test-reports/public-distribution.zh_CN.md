@@ -7,8 +7,8 @@
 
 Build: PASS，ESP-IDF 5.5.3 完整门禁。应用 **2,423,024 字节**，
 距 2.5 MB 余 **76,976 字节**。归档
-`build/firmware/ae3e56c7ca754f57c69ce94eaf8058dc09c0bbd42d51a6b2f1846490de44f1dd/`，
-匹配 ELF SHA-256 `d3bc5211a0c614424b647cd08f6c64416561f8bfb441a727276a39fdfef56f48`。
+`build/firmware/3f9bbb4de29f2efc929651db090b479e01d1a1bf79fe11ab83b5c06e16455d39/`，
+匹配 ELF SHA-256 `35bec8697bba09ecd015fcd4d2c0dae6eb56315774ab34c176049efd2da83427`。
 镜像已包含两个实际公共 Pages 服务地址。
 
 Host tests: PASS，包含 OS 门禁及独立源码快照。站点构建测试覆盖独立 fork 密钥、
