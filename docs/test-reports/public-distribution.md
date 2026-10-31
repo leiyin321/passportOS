@@ -76,3 +76,5 @@ regional CDN performance, interrupted-power rollback and hardware fault injectio
 Current-board OTA preserves data; arbitrary private-data and Bluetooth-bond bytes
 were not independently compared. No community article was posted by this workflow;
 firmware and player instructions are ready for that separate publication.
+
+Final unsigned Native-example CI: [firmware/Native source gate](https://github.com/leiyin321/passportOS/actions/runs/41222649873). Local compilation covered all four Native examples; SDK wheel and community first-install asset were also downloaded/verified as published. Private vulnerability reporting and one-review/static-check protection are enabled for the public repository.
