@@ -42,7 +42,10 @@ QueueHandle_t xQueueCreate(unsigned cap,size_t size){queue*q=calloc(1,sizeof(*q)
 int xQueueSend(QueueHandle_t v,const void*p,int wait){queue*q=v;
  if(v==ws_events)ws_wait=wait;
  if(q->count==q->cap && wait && v==ws_events && simulate_ws_consumer){q->count--;memmove(q->data,q->data+q->size,q->count*q->size);}
- if(q->count==q->cap)return 0;memcpy(q->data+q->count++*q->size,p,q->size);return 1;}
+ if(q->count==q->cap) return 0;
+ memcpy(q->data+q->count++*q->size,p,q->size);
+ return 1;
+}
 int xQueueReceive(QueueHandle_t v,void*p,int wait){queue*q=v;if(!q->count){if(wait==portMAX_DELAY)longjmp(worker_idle,1);return 0;}memcpy(p,q->data,q->size);q->count--;memmove(q->data,q->data+q->size,q->count*q->size);return 1;}
 void xQueueReset(QueueHandle_t q){((queue*)q)->count=0;}
 void vQueueDelete(QueueHandle_t q){free(q);}
