@@ -105,6 +105,7 @@ run_static_checks() {
     PYTHONDONTWRITEBYTECODE=1 python3 tests/test_check_repo.py
     PYTHONDONTWRITEBYTECODE=1 python3 tests/test_verify_firmware.py
     PYTHONDONTWRITEBYTECODE=1 python3 tests/test_wifi_setup_page.py
+    PYTHONDONTWRITEBYTECODE=1 python3 tests/passport/test_store_refresh.py
     PYTHONDONTWRITEBYTECODE=1 python3 tests/test_font_coverage.py
     PYTHONDONTWRITEBYTECODE=1 python3 tests/test_archive_firmware.py
     PYTHONDONTWRITEBYTECODE=1 python3 tests/test_install_passport_skills.py

@@ -858,14 +858,15 @@ static bool open_app(const char *id) {
 }
 // Re-entering Store must never offer installs from a stale catalog.
 static void refresh_store_catalog(void) {
-  cJSON_Delete(catalog);
-  catalog = NULL;
-  catalog_selection = 0;
-  store_installed_id[0] = 0;
+  // A package download still needs the selected entry when it completes.
   if (store_request) {
     snprintf(notice, sizeof(notice), "Loading Store...");
     return;
   }
+  cJSON_Delete(catalog);
+  catalog = NULL;
+  catalog_selection = 0;
+  store_installed_id[0] = 0;
   if (!service_approved && !*store_url) {
     service_pending = true;
     notice[0] = 0;
