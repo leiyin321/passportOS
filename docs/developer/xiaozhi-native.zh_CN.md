@@ -2,7 +2,7 @@
 
 # 小智 AI Native
 
-源码：[`examples/xiaozhi_native`](../../examples/xiaozhi_native/main.c)。应用 ID `org.passport.xiaozhi-native`，版本 1.0.4，`native-elf`、ABI 2。**下载前先升级 Passport OS 1.0.45；1.0.34 仅实现 Native ABI 1。** Lua 版保留独立应用 ID 和私有数据。
+源码：[`examples/xiaozhi_native`](../../examples/xiaozhi_native/main.c)。应用 ID `org.passport.xiaozhi-native`，版本 1.0.5，`native-elf`、ABI 2。**下载前先升级 Passport OS 1.0.45；1.0.34 仅实现 Native ABI 1。** Lua 版保留独立应用 ID 和私有数据。
 
 应用实现服务配置／激活、WebSocket 认证、hello 协商、按住说话、Opus 包传输、STT 识别与 TTS 回复显示。不使用 Lua 解释器，也不使用 OS 小智 provider。系统 Wi-Fi、HTTPS/WSS 传输／策略／TLS、授权、Opus 编解码任务、托管显示及退出回收交由 OS 的[通用 ABI 2 服务](native-services.zh_CN.md)。小智地址、认证头、JSON 消息及对话状态由应用源码维护。
 
@@ -40,3 +40,9 @@ HTTP 仅作为本地开发服务，需要设备已有局域网授权；包仍执
 验证和真机验收状态见[测试报告](../test-reports/xiaozhi-native.zh_CN.md)。宿主 mock 证明协议和回收请求路径，不代表远端激活或实际可听语音通过。
 
 在对话记录页单击 OK 可向小智发送问候（官方 `listen/detect` 消息），用于不按住麦克风时确认服务回复和扬声器播放。配置接口遇到暂时错误最多重试三次，之后等待用户重试。商店发布应将每个应用的当前包放在独立索引输入目录，生成索引后保留已发布的版本文件，避免旧下载失效。
+
+## 激活页面：Native 1.0.5
+
+激活页面显示激活码、https://xiaozhi.me/console/ 和指向此公开后台网址的二维码。登录后台并输入屏幕上的激活码，完成后在 Passport 按 OK 重新检查；激活码过期也可按 OK 重新获取服务配置。服务同时返回 WebSocket 地址时仍优先显示激活页面。中英文提示及深浅色配色跟随系统设置。二维码不包含设备标识或激活码。
+
+通过[线上应用商店](https://leiyin321.github.io/passportOS/apps/index.json)更新应用；OS 1.0.75 无须升级系统。后续系统和应用版本均通过公开线上服务分发。二维码头文件由 `python3 tools/passport/build_xiaozhi_activation_qr.py` 使用固定版本的 LVGL 二维码编码器生成；普通 Native 构建只需已提交的头文件。

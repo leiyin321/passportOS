@@ -1,5 +1,8 @@
 [简体中文 — complete original task specification](PASSPORT_OS_CODEX_HANDOFF.zh_CN.md)
 
+Latest app checkpoint: Native XiaoZhi 1.0.5 adds bilingual console URL/QR activation guidance. Complete build/host gate PASS; USB absent, new physical activation/scan and resource measurements pending. OS remains 1.0.75. All subsequent OS/app releases use online Pages distribution.
+
+
 Latest checkpoint: OS 1.0.75 (signed build 2026110102), installed directly from public Pages OTA and boot validated. Source is published at https://github.com/leiyin321/passportOS; Pages https://leiyin321.github.io/passportOS serves signed OS updates and three Native apps. Local and GitHub Linux host/firmware gates, Pages deployment, all public payload signatures/hashes, latest-version check and forced Native Store reinstall PASS. Public OTA took 210.83 s; Bluetooth package reinstall 4.23 s. App 2,423,200 bytes, 76,800 below 2.5 MB. See [public acceptance](test-reports/public-distribution.md) and [distribution guide](../distribution/README.md). First-install 8 MiB image and SDK wheel are release assets; destructive spare-board first installation and community article publication remain outside this acceptance. Original worktree/upstream remote are retained; the isolated publication checkout is `local/open-source/public-repository`. No USB Flash write/erase; serial closed.
 
 Store checkpoint — 2026-10-31: legacy Lua XiaoZhi (`org.passport.xiaozhi`, 0.2.8) retired from the live catalog and download directory at user request. Three entries remain: Native XiaoZhi 1.0.4, Bluetooth Peripherals 0.1.4 and City Radio 0.1.2. HTTP catalog, old-download 404 and remaining package size/hash checks PASS. Source examples, device-installed applications and persistent data are unchanged.

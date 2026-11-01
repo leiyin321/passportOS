@@ -1,11 +1,12 @@
 /* XiaoZhi protocol belongs to this application. OS exports generic services
  * only. */
 #include "passport_native_v2.h"
+#include "activation_qr.h"
 static const passport_native_host_v2 *H;
 static int zh, light, page, consent, held, listening, speaking, hello_sent,
     attempts;
 static uint32_t elapsed, deadline;
-enum { CONSENT, WIFI, CONFIG, CONNECT, HELLO, READY, FAILED, RETRY };
+enum { CONSENT, WIFI, CONFIG, CONNECT, HELLO, READY, FAILED, RETRY, ACTIVATE };
 static int phase;
 static char device[18], client[37], url[501], token[257], session[96];
 static char activation[32], heard[128], answer[192], detail[100];
@@ -66,7 +67,34 @@ static int quote(char *out, unsigned cap, const char *s) {
   return append(out, cap, "\"");
 }
 static const char *tr(const char *en, const char *cn) { return zh ? cn : en; }
+static void draw_activation(void) {
+  screen[0] = 0;
+  append(screen, sizeof(screen), tr("Link XiaoZhi\n", "绑定小智\n"));
+  append(screen, sizeof(screen), XIAOZHI_ACTIVATION_URL);
+  append(screen, sizeof(screen), tr("\nCode: ", "\n激活码："));
+  append(screen, sizeof(screen), activation);
+  append(screen, sizeof(screen),
+         tr("\nLog in, enter this code\nLinked/expired: OK retry\nDouble OK: "
+            "home\nScan or type the URL",
+            "\n登录后台输入激活码\n绑定后/过期按 OK 重试\n双击 OK "
+            "返回\n扫码或输入上方网址"));
+  H->base.clear(light ? 0xf1f6fb : 0x090f1c);
+  /* Five-pixel modules, four-module quiet zone; 163 commands including clear.
+   */
+  H->base.rect(37, 148, 165, 165, 0xffffff);
+  for (unsigned i = 0;
+       i < sizeof(activation_qr_runs) / sizeof(activation_qr_runs[0]); i++) {
+    const unsigned char *r = activation_qr_runs[i];
+    H->base.rect(37 + (r[1] + 4) * 5, 148 + (r[0] + 4) * 5, r[2] * 5, 5,
+                 0x000000);
+  }
+  H->base.text(screen, light ? 0x102334 : 0xf6faff);
+}
 static void draw(void) {
+  if (phase == ACTIVATE && activation[0]) {
+    draw_activation();
+    return;
+  }
   static const char *en[] = {"Microphone permission",    "Waiting for Wi-Fi",
                              "Checking XiaoZhi service", "Connecting WSS",
                              "Waiting for hello",        "Ready: hold OK",
@@ -227,12 +255,12 @@ static void configure(void) {
   append(scratch, sizeof(scratch), "\r\nClient-Id: ");
   append(scratch, sizeof(scratch), client);
   append(scratch, sizeof(scratch),
-         "\r\nUser-Agent: PassportOS-Native/1.0.4\r\nAccept-Language: ");
+         "\r\nUser-Agent: PassportOS-Native/1.0.5\r\nAccept-Language: ");
   append(scratch, sizeof(scratch), zh ? "zh-CN" : "en");
   append(scratch, sizeof(scratch), "\r\nContent-Type: application/json\r\n");
   static const char body[] =
       "{\"application\":{\"name\":\"Passport OS XiaoZhi "
-      "Native\",\"version\":\"1.0.4\"},\"board\":{\"type\":\"ai-passport\","
+      "Native\",\"version\":\"1.0.5\"},\"board\":{\"type\":\"ai-passport\","
       "\"name\":\"FoloToy AI Passport\"}}";
   if (!H->http_request("POST", "https://api.tenclass.net/xiaozhi/ota/", scratch,
                        body, sizeof(body) - 1)) {
@@ -300,7 +328,16 @@ static void receive(uint32_t kind, int32_t status, const void *data,
                   status);
       return;
     }
-    H->json_get(data, bytes, "activation.code", activation, sizeof(activation));
+    int activation_length = H->json_get(data, bytes, "activation.code",
+                                        activation, sizeof(activation));
+    if (activation_length > 0) {
+      phase = ACTIVATE;
+      held = listening = speaking = 0;
+      if (consent)
+        H->audio_mode(-1);
+      draw();
+      return;
+    }
     if (H->json_get(data, bytes, "websocket.url", url, sizeof(url)) <= 0) {
       fail(activation[0] ? "Activate at xiaozhi.me; OK retry"
                          : "Missing websocket URL",
@@ -407,6 +444,8 @@ static void event(uint32_t event, int32_t value) {
     else
       fail("Microphone permission denied", "麦克风权限被拒绝");
   } else if (event == PASSPORT_NATIVE_AUDIO_ERROR) {
+    if (phase == ACTIVATE)
+      return;
     listening = 0;
     held = 0;
     H->audio_mode(-1);
@@ -436,7 +475,7 @@ static void event(uint32_t event, int32_t value) {
       H->audio_mode(0);
       if (!message("listen", "detect"))
         fail("Greeting send failed", "连接失败，请重试");
-    } else if (page == 2 || phase == FAILED) {
+    } else if (page == 2 || phase == FAILED || phase == ACTIVATE) {
       stop();
       attempts = 0;
       configure();
@@ -474,6 +513,7 @@ int passport_app_entry(const passport_native_host_v1 *host,
   zh = equal(H->base.language(), "zh-CN");
   light = equal(H->base.display_mode(), "light");
   phase = CONSENT;
+  activation[0] = 0;
   page = 0;
   consent = 0;
   elapsed = 0;

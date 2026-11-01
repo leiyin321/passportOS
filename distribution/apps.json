@@ -15,8 +15,8 @@
     },
     {
       "id": "org.passport.xiaozhi-native",
-      "version": "1.0.4",
-      "file": "xiaozhi-native-1.0.4.pap",
+      "version": "1.0.5",
+      "file": "xiaozhi-native-1.0.5.pap",
       "source": "examples/xiaozhi_native"
     }
   ]

@@ -67,7 +67,7 @@ class SystemFontCoverage(unittest.TestCase):
                 try:char=bytes((hi,lo)).decode('gb2312')
                 except UnicodeDecodeError:continue
                 self.assertIn(ord(char),supported)
-        for char in '嘿，您好！媒体音量闹钟静音切换项目设置自动保存失败上下调节每次扫码连接热点打开配网页手动网络密码显示二维码下一步取消在手机完成配网未弹出页面可扫码请打开手机热点配置已保存个人允许他人加入开启最大兼容性正在自动连接尚未重新修改系统大小字节正在读取存储预留可用数据项查看详情当前应用包历史版本缓存及开销持久已每包含页另计刷新约浏览不可重试':self.assertIn(ord(char),supported)
+        for char in '嘿，您好！媒体音量闹钟静音切换项目设置自动保存失败上下调节每次扫码连接热点打开配网页手动网络密码显示二维码下一步取消在手机完成配网未弹出页面可扫码请打开手机热点配置已保存个人允许他人加入开启最大兼容性正在自动连接尚未重新修改绑定小智登录后台输入激活码绑定后过期按重试扫码或输入上方网址系统大小字节正在读取存储预留可用数据项查看详情当前应用包历史版本缓存及开销持久已每包含页另计刷新约浏览不可重试':self.assertIn(ord(char),supported)
         source=Path('main/passport_main.c').read_text()
         self.assertGreaterEqual(source.count('lv_obj_set_style_text_font(app_body, multilingual_font(), 0)'),2)
 

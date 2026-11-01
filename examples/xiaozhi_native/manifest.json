@@ -2,7 +2,7 @@
   "format": "passport.app/1",
   "id": "org.passport.xiaozhi-native",
   "name": "XiaoZhi AI Native",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "runtime": "native-elf",
   "entry": "app.app.elf",
   "min_os_api": 1,

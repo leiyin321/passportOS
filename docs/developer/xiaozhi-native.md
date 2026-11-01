@@ -2,7 +2,7 @@
 
 # XiaoZhi AI Native
 
-Source: [`examples/xiaozhi_native`](../../examples/xiaozhi_native/main.c). App ID `org.passport.xiaozhi-native`, version 1.0.4, runtime `native-elf`, ABI 2. **Upgrade to Passport OS 1.0.45 before downloading. OS 1.0.34 only implements Native ABI 1.** The Lua app retains its separate ID and private data.
+Source: [`examples/xiaozhi_native`](../../examples/xiaozhi_native/main.c). App ID `org.passport.xiaozhi-native`, version 1.0.5, runtime `native-elf`, ABI 2. **Upgrade to Passport OS 1.0.45 before downloading. OS 1.0.34 only implements Native ABI 1.** The Lua app retains its separate ID and private data.
 
 The application implements service configuration/activation, WebSocket authentication and hello negotiation, manual push-to-talk, Opus packet forwarding, STT/transcript and TTS reply display. It does not use a Lua interpreter or an OS XiaoZhi provider. System Wi-Fi, HTTPS/WSS transport/policy/TLS, consent, Opus codec workers, managed display and teardown belong to OS [generic ABI 2 services](native-services.md). Native app source owns the service URL, request headers, JSON messages and conversation state.
 
@@ -10,7 +10,7 @@ The protocol follows the [official WebSocket specification](https://github.com/7
 
 ## Use
 
-1. Update OS through Settings → System Update, then download **XiaoZhi AI Native** from the local App Store.
+1. Update OS through Settings → System Update, then download **XiaoZhi AI Native** from the online App Store.
 2. Open it and press OK once to grant microphone consent. UP/DOWN denies consent. Reopen the app to request consent again.
 3. It waits for actual OS Wi-Fi readiness, requests the official service configuration, opens authenticated WSS and exchanges hello. An activation code, when provided, is displayed for linking at xiaozhi.me; activation belongs to the application/service, not OS settings.
 4. On the voice page, hold OK to speak and release to finish. Replies play through the system audio worker. UP/DOWN cycles voice, conversation and service pages. Double OK returns Home and reclaims resources.
@@ -40,3 +40,9 @@ The HTTP origin is a local development service requiring the existing device LAN
 Validation and current device acceptance are tracked in the [test report](../test-reports/xiaozhi-native.md). Host mocks verify protocol and cleanup requests; they do not prove remote activation or audible speech.
 
 A single OK on the conversation page sends the official `listen/detect` greeting, allowing service/playback checks without holding the microphone. Transient configuration errors retry at most three times, then wait for explicit retry. For immutable store publication, generate the index from a staging directory containing one current package per app, while retaining older version files in the served directory.
+
+## Activation screen: Native 1.0.5
+
+The activation page displays the code, https://xiaozhi.me/console/ and a QR code for that public console URL. Log in, enter the displayed code, then press OK on Passport to check again. Expired codes also use OK to request a fresh configuration. Activation takes priority even when the configuration also contains a WebSocket URL. English/Chinese instructions and light/dark palettes follow system settings. No device identifier or activation code is encoded in the QR.
+
+Update the app through the [online App Store](https://leiyin321.github.io/passportOS/apps/index.json); no OS upgrade is required on OS 1.0.75. Future OS and app releases use the public online distribution. The committed QR header is generated with `python3 tools/passport/build_xiaozhi_activation_qr.py`, using the pinned LVGL QR encoder; ordinary Native builds need only the generated header.

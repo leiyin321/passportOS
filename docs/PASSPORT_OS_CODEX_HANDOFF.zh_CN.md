@@ -1,5 +1,8 @@
 [English](PASSPORT_OS_CODEX_HANDOFF.md)
 
+最新应用检查点：Native 小智 1.0.5 增加中英文后台网址、二维码及激活引导。完整构建与主机测试通过；USB 未检测到，新页面扫码及实机资源测量待验证。OS 保持 1.0.75，后续系统与应用更新统一走线上 Pages 服务。
+
+
 最新检查点：OS 1.0.75（签名构建 2026110102）已直接通过公共 Pages OTA 安装并验证启动。源码 https://github.com/leiyin321/passportOS 已公开，Pages https://leiyin321.github.io/passportOS 提供签名系统更新及三个 Native 应用。本地/GitHub Linux 主机及固件门禁、Pages 部署、全部公共产物签名/哈希、最新版检查、Native 商店强制重装均 PASS。公共 OTA 210.83 秒，蓝牙包重装 4.23 秒。应用 2,423,200 字节，距 2.5 MB 余 76,800，见[公共验收](test-reports/public-distribution.zh_CN.md)和[分发指南](../distribution/README.zh_CN.md)。Release 提供 8 MiB 首次安装镜像及 SDK wheel；备用板覆盖式首次安装和社区文章发布不在本次已验收范围。原工作区/上游 remote 保留，独立发布仓库在 `local/open-source/public-repository`。无 USB Flash 写入/擦除，串口关闭。
 
 商店检查点 — 2026-10-31：按用户要求下架旧 Lua 小智（`org.passport.xiaozhi`，0.2.8），从实时索引和下载目录移除。保留 Native 小智 1.0.4、蓝牙外设 0.1.4、城市电台 0.1.2 三项。HTTP 索引、旧下载 404、其余包大小/哈希检查 PASS。保留源码示例、设备已安装应用和持久数据。

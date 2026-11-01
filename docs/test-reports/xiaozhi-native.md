@@ -28,7 +28,7 @@ Official HTTPS configuration returned 200, certificate validation succeeded, WSS
 - frames=50, Opus TX=49, RX=0, unused stack=3304 bytes, max read=45187 us
 - frames=51, Opus TX=50, RX=107, unused stack=3300 bytes, max read=45224 us
 
-No panic, failed allocation or stalled receive queue occurred in the final runs. Native pool usage returned to zero on exit. See sanitized metrics (`xiaozhi-native-results.txt`; local diagnostics, not published); raw logs, transcripts, activation data and tokens remain under ignored `local/native_xiaozhi/`.
+No panic, failed allocation or stalled receive queue occurred in the final runs. Native pool usage returned to zero on exit. See sanitized metrics; raw logs, transcripts, activation data and tokens remain under ignored `local/native_xiaozhi/`.
 
 ## Architecture and corrected failures
 
@@ -72,3 +72,11 @@ The mixed run plays a greeting, interrupts playback with press/release capture, 
 ## Compatibility and lifecycle regression
 
 On OS 1.0.45, ABI 1 Native Hello launched, handled an injected OK click and exited; Lua XiaoZhi launched and exited with its interpreter reclaimed (`lua=0` after exit). This verifies startup/lifecycle, not the Lua remote speech service. Native XiaoZhi then passed 100/100 launch/exit cycles in 8,930,072 microseconds, with a 36-byte reported heap drift and zero executable-pool usage on exit. This bounded test is not a long-duration leak proof.
+
+## Native 1.0.5 activation guidance — 2026-11-01
+
+Complete repository gate: PASS (host tests and ESP-IDF 5.5.3 firmware build). Address/undefined sanitizers cover activation priority, retry, no premature WebSocket/capture, four language/theme combinations, bounds and the 192-command limit. All new Chinese labels pass font coverage. The rendered 240×320 host QR was decoded with macOS Vision to exactly https://xiaozhi.me/console/. This is not a physical camera test.
+
+The static QR uses 483 bytes of run data and 163 total draw commands. Native executable span: 14,084 bytes (previous 13,060); ELF file: 13,480 bytes; signed package: 14,464 bytes. Package SHA-256: `15e36dc60bfae24e1422620bf0d775760d056839ed1a1aa439fd4d03830e98d6`. No additional runtime QR heap is allocated. Actual board RAM peak, app-exit reclamation and physical rendering for this version are NOT RUN: USB device was absent; the temporary local preview package was not installed. Previous-version device measurements above must not be substituted.
+
+The user confirmed real unbind/rebind with 1.0.4 before this change. The new real activation page and phone scan remain user acceptance checks. No cloud binding was changed by this implementation. OS stays 1.0.75; publish the app through Pages using the existing signed OS payload, without rebuilding or replacing its public binary.
