@@ -856,6 +856,34 @@ static bool open_app(const char *id) {
   measure("runtime");
   return ok;
 }
+// Re-entering Store must never offer installs from a stale catalog.
+static void refresh_store_catalog(void) {
+  cJSON_Delete(catalog);
+  catalog = NULL;
+  catalog_selection = 0;
+  store_installed_id[0] = 0;
+  if (store_request) {
+    snprintf(notice, sizeof(notice), "Loading Store...");
+    return;
+  }
+  if (!service_approved && !*store_url) {
+    service_pending = true;
+    notice[0] = 0;
+    return;
+  }
+  char url[512];
+  if (*store_url)
+    snprintf(url, sizeof(url), "%s", store_url);
+  else
+    snprintf(url, sizeof(url), "http://%s:%u/index.json", service_ip,
+             service_http);
+  store_request = 1;
+  bool ok = ps_net_fetch(NULL, url, 0xffffffff, true);
+  if (!ok) store_request = 0;
+  snprintf(notice, sizeof(notice), "%s",
+           ok ? "Loading Store..." : "Offline / busy / endpoint denied");
+}
+
 static bool installed_app_is_current(const char *id, const char *catalog_version) {
   ps_package installed = {0};
   if (!id || !catalog_version || !ps_store_load(id, &installed))
@@ -2392,6 +2420,7 @@ void app_main(void) {
               page = 1;
               selection = 0;
               refresh_app_list();
+              if (focus == 1) refresh_store_catalog();
             }
           } else if (focus == 0 && app_count) {
             if (page == 3) {

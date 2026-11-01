@@ -95,3 +95,7 @@ or untrusted content is rejected. This is post-stabilization work, not current c
 
 See [execution checkpoint](tasks.md), [hardware audit](hardware-audit.md),
 [package protocol](developer/package-protocol.md), and milestone reports under `test-reports/`.
+
+## OS 1.0.76: Store refresh on entry
+
+Every Home → App Store entry discards the in-memory catalog and requests the configured catalog asynchronously. A loading notice blocks installation from stale entries. Offline/busy failures remain visible and OK retries; installed applications remain available in the library. An already-running Store transfer is not duplicated. Local service consent is preserved. Distribution remains online. Device acceptance is pending (USB absent): enter Store, publish a newer app, return Home, re-enter Store and verify the new version without rebooting; also test offline retry.
